@@ -10,6 +10,12 @@ struct Mist
     }
 }
 
+func configure(using config: Mist.Configuration)
+{
+    Mist.registerComponents(using: config)
+    Mist.registerMistSocket(using: config)
+}
+
 extension Mist
 {
     // initialize component system
