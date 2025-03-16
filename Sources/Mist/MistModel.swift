@@ -87,13 +87,13 @@ extension Mist
     }
     
     // single context
-    struct SingleComponentContext: Encodable
+    public struct SingleComponentContext: Encodable
     {
         let component: ModelContainer
     }
     
     // collection context
-    struct MultipleComponentContext: Encodable
+    public struct MultipleComponentContext: Encodable
     {
         let components: [ModelContainer]
     }

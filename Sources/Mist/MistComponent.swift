@@ -18,7 +18,7 @@ public extension Mist
 }
 
 // default naming
-extension Mist.Component
+public extension Mist.Component
 {
     // name matches component type name
     static var name: String { String(describing: self) }
