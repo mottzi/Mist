@@ -3,17 +3,17 @@ import Fluent
 
 public struct Mist
 {
-    static func configure(using config: Mist.Configuration)
+    public static func configure(using config: Mist.Configuration)
     {
         Mist.registerComponents(using: config)
         Mist.registerMistSocket(using: config)
     }
 }
 
-extension Mist
+public extension Mist
 {
     // initialize component system
-    static func registerComponents(using config: Configuration)
+    static func registerComponents(using config: Mist.Configuration)
     {
         // register configured components
         Task

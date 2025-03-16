@@ -1,7 +1,7 @@
 import Vapor
 import Fluent
 
-extension Mist
+public extension Mist
 {
     // mist models are fluent models that use UUID as id
     protocol Model: Fluent.Model where IDValue == UUID {}

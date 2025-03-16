@@ -1,7 +1,7 @@
 import Vapor
 import Fluent
 
-extension Mist
+public extension Mist
 {
     struct Configuration: Sendable
     {
