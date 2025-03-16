@@ -31,7 +31,7 @@ public extension Mist.Component
 extension Mist.Component
 {
     // create single component context
-    static func makeContext(of componentID: UUID, in db: Database) async -> Mist.SingleComponentContext?
+    public static func makeContext(of componentID: UUID, in db: Database) async -> Mist.SingleComponentContext?
     {
         // data container for dynamic multi model context creation
         var componentData = Mist.ModelContainer()
@@ -57,7 +57,7 @@ extension Mist.Component
     }
     
     // create collection context for multiple components
-    static func makeContext(ofAll db: Database) async -> Mist.MultipleComponentContext?
+    public static func makeContext(ofAll db: Database) async -> Mist.MultipleComponentContext?
     {
         // array of data containes for dynamic multi model context creation
         var componentDataCollection: [Mist.ModelContainer] = []

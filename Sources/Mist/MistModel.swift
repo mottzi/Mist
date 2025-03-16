@@ -36,7 +36,7 @@ extension Mist.Model
 extension Mist
 {
     // container to hold model instances for rendering
-    struct ModelContainer: Encodable
+    public struct ModelContainer: Encodable
     {
         // store encodable model data keyed by lowercase model type name
         private var models: [String: Encodable] = [:]
@@ -48,7 +48,7 @@ extension Mist
         }
         
         // flattens the models dictionary when encoding making properties directly accessible in template
-        func encode(to encoder: Encoder) throws
+        public func encode(to encoder: Encoder) throws
         {
             var container = encoder.container(keyedBy: StringCodingKey.self)
             
