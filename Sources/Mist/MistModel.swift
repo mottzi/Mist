@@ -8,7 +8,7 @@ public extension Mist
 }
 
 // type-erased finder operations
-extension Mist.Model
+public extension Mist.Model
 {
     // type-erased find() function as closure that captures concrete model type
     static var find: (UUID, Database) async -> (any Mist.Model)?
