@@ -36,7 +36,7 @@ public extension Mist.Model
 public extension Mist
 {
     // container to hold model instances for rendering
-    struct ModelContainer: Encodable
+    public struct ModelContainer: Encodable
     {
         // store encodable model data keyed by lowercase model type name
         private var models: [String: Encodable] = [:]
@@ -62,12 +62,12 @@ public extension Mist
     }
     
     // helper struct for string-based coding keys
-    struct StringCodingKey: CodingKey
+    public struct StringCodingKey: CodingKey
     {
         public var stringValue: String
         public var intValue: Int?
         
-        init(_ string: String)
+        public init(_ string: String)
         {
             self.stringValue = string
             self.intValue = nil
@@ -87,13 +87,13 @@ public extension Mist
     }
     
     // single context
-    struct SingleComponentContext: Encodable
+    public struct SingleComponentContext: Encodable
     {
         let component: ModelContainer
     }
     
     // collection context
-    struct MultipleComponentContext: Encodable
+    public struct MultipleComponentContext: Encodable
     {
         let components: [ModelContainer]
     }
