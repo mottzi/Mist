@@ -60,14 +60,11 @@ public extension Mist
             }
         }
         
-        public init(models: [String : Encodable])
-        {
-            self.models = models
-        }
+        public init() {}
     }
     
     // helper struct for string-based coding keys
-    public struct StringCodingKey: CodingKey
+    struct StringCodingKey: CodingKey
     {
         public var stringValue: String
         public var intValue: Int?
@@ -92,14 +89,18 @@ public extension Mist
     }
     
     // single context
-    public struct SingleComponentContext: Encodable
+    struct SingleComponentContext: Encodable
     {
         let component: ModelContainer
+        
+        public init(component: ModelContainer) { self.component = component }
     }
     
     // collection context
-    public struct MultipleComponentContext: Encodable
+    struct MultipleComponentContext: Encodable
     {
         let components: [ModelContainer]
+        
+        public init(components: [ModelContainer]) { self.components = components }
     }
 }
