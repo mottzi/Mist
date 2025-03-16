@@ -36,11 +36,13 @@ public extension Mist.Model
 public extension Mist
 {
     // container to hold model instances for rendering
-    public struct ModelContainer: Encodable
+    struct ModelContainer: Encodable
     {
         // store encodable model data keyed by lowercase model type name
         private var models: [String: Encodable] = [:]
         
+        var isEmpty: Bool { return models.isEmpty }
+
         // Add a model instance to the container
         mutating func add<M: Mist.Model>(_ model: M, for key: String)
         {
@@ -58,7 +60,10 @@ public extension Mist
             }
         }
         
-        var isEmpty: Bool { return models.isEmpty }
+        public init(models: [String : Encodable])
+        {
+            self.models = models
+        }
     }
     
     // helper struct for string-based coding keys
