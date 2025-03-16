@@ -44,7 +44,7 @@ public extension Mist
         var isEmpty: Bool { return models.isEmpty }
 
         // Add a model instance to the container
-        mutating func add<M: Mist.Model>(_ model: M, for key: String)
+        public mutating func add<M: Mist.Model>(_ model: M, for key: String)
         {
             models[key] = model
         }
