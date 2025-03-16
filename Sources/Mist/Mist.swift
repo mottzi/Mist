@@ -1,19 +1,13 @@
 import Vapor
 import Fluent
 
-struct Mist
+public struct Mist
 {
     static func configure(using config: Mist.Configuration)
     {
         Mist.registerComponents(using: config)
         Mist.registerMistSocket(using: config)
     }
-}
-
-func configure(using config: Mist.Configuration)
-{
-    Mist.registerComponents(using: config)
-    Mist.registerMistSocket(using: config)
 }
 
 extension Mist
