@@ -33,10 +33,10 @@ extension Mist.Model
     }
 }
 
-extension Mist
+public extension Mist
 {
     // container to hold model instances for rendering
-    public struct ModelContainer: Encodable
+    struct ModelContainer: Encodable
     {
         // store encodable model data keyed by lowercase model type name
         private var models: [String: Encodable] = [:]
@@ -64,8 +64,8 @@ extension Mist
     // helper struct for string-based coding keys
     struct StringCodingKey: CodingKey
     {
-        var stringValue: String
-        var intValue: Int?
+        public var stringValue: String
+        public var intValue: Int?
         
         init(_ string: String)
         {
@@ -73,13 +73,13 @@ extension Mist
             self.intValue = nil
         }
         
-        init?(stringValue: String)
+        public init?(stringValue: String)
         {
             self.stringValue = stringValue
             self.intValue = nil
         }
         
-        init?(intValue: Int)
+        public init?(intValue: Int)
         {
             self.stringValue = String(intValue)
             self.intValue = intValue
@@ -87,13 +87,13 @@ extension Mist
     }
     
     // single context
-    public struct SingleComponentContext: Encodable
+    struct SingleComponentContext: Encodable
     {
         let component: ModelContainer
     }
     
     // collection context
-    public struct MultipleComponentContext: Encodable
+    struct MultipleComponentContext: Encodable
     {
         let components: [ModelContainer]
     }
