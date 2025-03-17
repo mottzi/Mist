@@ -1,0 +1,24 @@
+{
+  "configurations" : [
+    {
+      "id" : "1990940D-C389-414E-BF09-050629B49264",
+      "name" : "Configuration 1",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "testTimeoutsEnabled" : true
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:",
+        "identifier" : "MistTests",
+        "name" : "MistTests"
+      }
+    }
+  ],
+  "version" : 1
+}

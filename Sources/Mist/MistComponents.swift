@@ -46,3 +46,13 @@ extension Mist
         }
     }
 }
+
+#if DEBUG
+extension Mist.Components
+{
+    func testGetComponentsArray() async -> [Mist.AnyComponent]
+    {
+        return components
+    }
+}
+#endif

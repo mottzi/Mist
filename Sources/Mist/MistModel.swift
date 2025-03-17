@@ -49,7 +49,7 @@ public extension Mist
             models[key] = model
         }
         
-        // flattens the models dictionary when encoding making properties directly accessible in template
+        // flattens the models dictionary when encoding, making properties directly accessible in template
         public func encode(to encoder: Encoder) throws
         {
             var container = encoder.container(keyedBy: StringCodingKey.self)
