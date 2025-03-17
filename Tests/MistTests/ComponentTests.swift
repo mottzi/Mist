@@ -3,11 +3,12 @@ import XCTest
 import Vapor
 import Fluent
 import FluentSQLiteDriver
+@testable import WebSocketKit
 
 final class ComponentTests: XCTestCase
 {
     // Tests component registration:
-    // - deduplication - model associations - registry integrity - order preservation - model-based lookup
+    // - deduplication - model associations - component storage integrity - order preservation - model-based lookup
     func testComponentRegistration() async throws
     {
         // initialize test environment
@@ -35,6 +36,60 @@ final class ComponentTests: XCTestCase
         XCTAssertEqual(componentsArray[1].name, "DummyRow2", "Second component should be 'DummyRow2'")
 
         try await app.asyncShutdown()
+    }
+    
+    // Tests server subscription message handling:
+    // - message decoding - client storage integrity - connection verification - UUID matching
+    func testSubscriptionMessageHandling() async
+    {
+        // create test client
+        let clientID = UUID()
+        
+        // use API to add test client to internal storage
+        await Mist.Clients.shared.add(connection: clientID, socket: WebSocket.makeDummy())
+        
+        // create test json message
+        let text = """
+        {
+            "type": "subscribe",
+            "component": "TestComponent2"
+        }
+        """
+        
+        // try to decode json message to mist message
+        guard let data = text.data(using: .utf8) else { return XCTFail("Failed to convert JSON string to data") }
+        guard let message = try? JSONDecoder().decode(Mist.Message.self, from: data) else { return XCTFail("Failed to decode data to message") }
+        
+        switch message
+        {
+            // if message is subscribe message
+            case .subscribe(let component): do
+            {
+                XCTAssertEqual(component, "TestComponent2", "Component should match message")
+
+                // use API to add component name to client's subscription set
+                await Mist.Clients.shared.addSubscription(component, for: clientID)
+                
+                // load internal storage
+                let connections = await Mist.Clients.shared.connections
+                
+                // test internal storage
+                XCTAssertEqual(connections.count, 1, "Only one client should exist")
+                XCTAssertEqual(connections[0].id, clientID, "Client should exist")
+                XCTAssert(connections[0].subscriptions.contains("TestComponent2"), "Client should be subscribed to component")
+                XCTAssertEqual(connections[0].subscriptions.count, 1, "Client should have exactly one subscription")
+            }
+            
+            default: return XCTFail("Valid but non-subscribe message")
+        }
+    }
+}
+
+extension WebSocket
+{
+    static func makeDummy() -> WebSocket
+    {
+        WebSocket(channel: EmbeddedChannel(loop: EmbeddedEventLoop()), type: PeerType.server)
     }
 }
 
