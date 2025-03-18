@@ -13,13 +13,37 @@ final class ClientRegistry: XCTestCase
         await Mist.Clients.shared.resetForTesting()
     }
     
-    // Tests server subscription message handling:
-    // - message decoding - client storage integrity - connection verification - UUID matching
-    func testClientComponentSubscription() async
+    func testInternalStorage() async
     {
         // create test client
         let clientID = UUID()
         
+        // use API to add test client to internal storage
+        await Mist.Clients.shared.add(connection: clientID, socket: WebSocket.Dummy)
+        
+        // load internal storage
+        var connections = await Mist.Clients.shared.connections
+        
+        // test internal storage after adding client
+        XCTAssertEqual(connections.count, 1, "Only one client should exist")
+        XCTAssertEqual(connections[0].id, clientID, "Client ID should match")
+        XCTAssertEqual(connections[0].subscriptions.count, 0, "Client should not have subscriptions")
+        
+        // use API to add component name to client's subscription set
+        await Mist.Clients.shared.addSubscription("MyComponent", for: clientID)
+        
+        // load internal storage
+        connections = await Mist.Clients.shared.connections
+        
+        // test internal storage after adding subscription to client
+        XCTAssertEqual(connections[0].subscriptions.count, 1, "Client should have exactly one subscription")
+        XCTAssert(connections[0].subscriptions.contains("MyComponent"), "Client should be subscribed to component")
+    }
+    
+    // Tests server subscription message handling:
+    // - message decoding - client storage integrity - connection verification - UUID matching
+    func testSubscriptionDecoding() async
+    {
         // create test json message
         let text = """
         {
@@ -27,9 +51,6 @@ final class ClientRegistry: XCTestCase
             "component": "TestComponent2"
         }
         """
-        
-        // use API to add test client to internal storage
-        await Mist.Clients.shared.add(connection: clientID, socket: WebSocket.Dummy)
         
         // try to decode json message to mist message
         guard let data = text.data(using: .utf8) else { return XCTFail("Failed to convert JSON string to data") }
@@ -42,18 +63,6 @@ final class ClientRegistry: XCTestCase
             {
                 // test correct decoding of component name
                 XCTAssertEqual(component, "TestComponent2", "Mist message component should match JSON component string")
-                
-                // use API to add component name to client's subscription set
-                await Mist.Clients.shared.addSubscription(component, for: clientID)
-                
-                // load internal storage
-                let connections = await Mist.Clients.shared.connections
-                
-                // test internal storage
-                XCTAssertEqual(connections.count, 1, "Only one client should exist")
-                XCTAssertEqual(connections[0].id, clientID, "Client should exist")
-                XCTAssert(connections[0].subscriptions.contains("TestComponent2"), "Client should be subscribed to component")
-                XCTAssertEqual(connections[0].subscriptions.count, 1, "Client should have exactly one subscription")
             }
             
             // ensure correct decoding
