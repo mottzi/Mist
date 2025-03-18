@@ -104,9 +104,9 @@ extension Mist.Component
     // check if component should update when the provided model changes
     static func shouldUpdate<M: Model>(for model: M) -> Bool
     {
-        return models.contains()
-        { modelType in
-            ObjectIdentifier(modelType) == ObjectIdentifier(M.self)
+        return models.contains
+        { componentModelType in
+            ObjectIdentifier(componentModelType) == ObjectIdentifier(M.self)
         }
     }
 }
@@ -135,8 +135,7 @@ extension Mist
             // capture concrete type function
             self._shouldUpdate =
             { model in
-                guard let model = model as? any Model else { return false }
-                
+                guard let model = model as? any Mist.Model else { return false }
                 return C.shouldUpdate(for: model)
             }
             

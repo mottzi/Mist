@@ -22,7 +22,7 @@ extension Mist
         func update(model: M, on db: Database, next: AnyAsyncModelResponder) async throws
         {
             logger.warning("Listener for model '\(String(describing: model.self))' was triggered.")
-
+            
             // perform middleware chain
             try await next.update(model, on: db)
             
@@ -32,31 +32,34 @@ extension Mist
             // get type-safe components registered for this model type
             let components = await Components.shared.getComponents(for: M.self)
             
-            // safely unwrap renderer
-            let renderer = config.app.leaf.renderer
-            
             // process each component
             for component in components
             {
-                // Only update if component says it should
-                guard component.shouldUpdate(for: model) else { continue }
-                
-                // render using ID and database
-                guard let html = await component.render(id: modelID, on: db, using: renderer) else { continue }
-                
-                // create update message with component data
-                let message = Message.componentUpdate(
-                    component: component.name,
-                    action: "update",
-                    id: modelID,
-                    html: html
-                )
-                
-                // broadcast to all connected clients
-                await Clients.shared.broadcast(message)
-                
-                logger.warning("Broadcasting Component '\(component.name)'")
+                await processComponent(component, for: model, modelID: modelID, db: db, renderer: config.app.leaf.renderer)
             }
+        }
+        
+        // Process a single component and broadcast update if needed
+        private func processComponent(_ component: AnyComponent, for model: M, modelID: UUID, db: Database, renderer: ViewRenderer) async
+        {
+            // Only update if component says it should
+            guard component.shouldUpdate(for: model) else { return }
+            
+            // render using ID and database
+            guard let html = await component.render(id: modelID, on: db, using: renderer) else { return }
+            
+            // create update message with component data
+            let message = Message.componentUpdate(
+                component: component.name,
+                action: "update",
+                id: modelID,
+                html: html
+            )
+            
+            // broadcast to all connected clients
+            await Clients.shared.broadcast(message)
+            
+            logger.warning("Broadcasting Component '\(component.name)'")
         }
     }
 }

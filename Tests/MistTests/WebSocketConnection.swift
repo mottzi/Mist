@@ -1,8 +1,8 @@
 import XCTVapor
-@testable import Mist
 import Vapor
 import Fluent
 import FluentSQLiteDriver
+@testable import Mist
 
 final class WebSocketConnection: XCTestCase
 {
@@ -12,9 +12,8 @@ final class WebSocketConnection: XCTestCase
         await Mist.Components.shared.resetForTesting()
     }
     
-    // Tests server subscription message handling:
-    // - message decoding - client storage integrity - connection verification - UUID matching
-    func testClientSubscriptionDecoding() async
+    // tests decoding json subscription message to Mist.Message type
+    func testSubscriptionDecoding() async
     {
         // create test json message
         let text = """
@@ -42,7 +41,8 @@ final class WebSocketConnection: XCTestCase
         }
     }
     
-    func testClientSubscriptionOverSocket() async throws
+    // tests integrated subscription message flow: client -> server -> internal storage registry
+    func testSubscriptionFlow() async throws
     {
         let app = try await Application.make(.testing)
         app.databases.use(.sqlite(.memory), as: .sqlite)
@@ -51,7 +51,7 @@ final class WebSocketConnection: XCTestCase
         let config = Mist.Configuration(app: app, components: [])
         await Mist.registerComponents(using: config)
         
-        // test this message
+        // test this client message
         let message = #"{ "type": "subscribe", "component": "DumbComp4133" }"#
         
         // set up websocket on server
@@ -61,7 +61,7 @@ final class WebSocketConnection: XCTestCase
             // create client
             let clientID = UUID()
             
-            // use API to add client to internal storage (tested in ClientRegistry.testInternalStorage()
+            // use API to add client to internal storage
             await Mist.Clients.shared.add(connection: clientID, socket: ws)
             
             // get internal storage
@@ -112,14 +112,14 @@ final class WebSocketConnection: XCTestCase
         // start server (will block indefinitly and cause timeout, that's fine atm)
         try await app.startup()
         
-        // connect client to server websocket
+        // client connects to server socket
         try await WebSocket.connect(to: "ws://localhost:8080/socket")
         { ws in
             Task
             {
                 print("*** client sending subscription message: \(message)")
                 
-                // make client send component subscription message to server
+                // send component subscription message to client -> server
                 ws.send(message)
             }
         }

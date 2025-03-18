@@ -1,9 +1,9 @@
 import XCTest
-@testable import Mist
 import Vapor
 import Fluent
 import FluentSQLiteDriver
 @testable import WebSocketKit
+@testable import Mist
 
 final class ClientRegistry: XCTestCase
 {
