@@ -9,7 +9,7 @@ final class ClientRegistry: XCTestCase
 {
     override func setUp() async throws
     {
-        // Reset singletons before each test
+        // reset singletons before each test
         await Mist.Clients.shared.resetForTesting()
     }
     

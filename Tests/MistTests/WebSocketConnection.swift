@@ -8,6 +8,7 @@ final class WebSocketConnection: XCTestCase
 {
     override func setUp() async throws
     {
+        // reset singletons before each test
         await Mist.Clients.shared.resetForTesting()
         await Mist.Components.shared.resetForTesting()
     }
