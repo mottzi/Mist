@@ -6,6 +6,13 @@ import FluentSQLiteDriver
 
 final class ComponentRegistry: XCTestCase
 {
+    override func setUp() async throws
+    {
+        // Reset singletons before each test
+        await Mist.Clients.shared.resetForTesting()
+        await Mist.Components.shared.resetForTesting()
+    }
+    
     // tests integrity of internal component registry and deduplication
     func testInternalStorage() async throws
     {
@@ -18,7 +25,7 @@ final class ComponentRegistry: XCTestCase
         await Mist.registerComponents(using: config)
         
         // get internal component registry
-        let componentsArray = await Mist.Components.shared.testGetComponentsArray()
+        let componentsArray = await Mist.Components.shared.getStorgeForTesting()
         
         // verify internal component registry integrity
         XCTAssertEqual(componentsArray.count, 2, "Registry should contain exactly 2 components")

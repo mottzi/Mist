@@ -50,9 +50,14 @@ extension Mist
 #if DEBUG
 extension Mist.Components
 {
-    func testGetComponentsArray() async -> [Mist.AnyComponent]
+    func getStorgeForTesting() async -> [Mist.AnyComponent]
     {
         return components
+    }
+    
+    func resetForTesting() async
+    {
+        components = []
     }
 }
 #endif

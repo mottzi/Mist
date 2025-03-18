@@ -82,3 +82,13 @@ extension Mist.Clients
         }
     }
 }
+
+#if DEBUG
+extension Mist.Clients
+{
+    func resetForTesting() async
+    {
+        connections = []
+    }
+}
+#endif

@@ -7,6 +7,12 @@ import FluentSQLiteDriver
 
 final class ClientRegistry: XCTestCase
 {
+    override func setUp() async throws
+    {
+        // Reset singletons before each test
+        await Mist.Clients.shared.resetForTesting()
+    }
+    
     // Tests server subscription message handling:
     // - message decoding - client storage integrity - connection verification - UUID matching
     func testClientComponentSubscription() async
