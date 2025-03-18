@@ -31,7 +31,7 @@ extension Mist
                 if isModelUsed == false
                 {
                     // register db model listener middleware
-                    model.createListener(using: config)
+                    model.createListener(using: config, on: config.db)
                 }
             }
             
@@ -44,12 +44,27 @@ extension Mist
         {
             return components.filter { $0.models.contains { ObjectIdentifier($0) == ObjectIdentifier(type) } }
         }
+        
+        // checks if component with given name exists
+        func hasComponent(name: String) -> Bool
+        {
+            return components.contains { $0.name == name }
+        }
     }
 }
 
 #if DEBUG
 extension Mist.Components
 {
+    func registerWithoutListenerForTesting<C: Mist.Component>(component: C.Type)
+    {
+        // abort if component name is already registered
+        guard components.contains(where: { $0.name == C.name }) == false else { return }
+        
+        // add new type erased mist component to storage
+        components.append(Mist.AnyComponent(component))
+    }
+    
     func getStorgeForTesting() async -> [Mist.AnyComponent]
     {
         return components

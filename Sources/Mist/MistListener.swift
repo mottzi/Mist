@@ -4,9 +4,9 @@ import Fluent
 extension Mist.Model
 {
     // registers db middleware listener on Fluent db changes
-    static func createListener(using config: Mist.Configuration)
+    static func createListener(using config: Mist.Configuration, on db: DatabaseID?)
     {
-        config.app.databases.middleware.use(Mist.Listener<Self>(config: config), on: config.db)
+        config.app.databases.middleware.use(Mist.Listener<Self>(config: config), on: db)
     }
 }
 

@@ -11,10 +11,10 @@ extension Mist
         { request, ws async in
             
             // create new connection on upgrade
-            let id = UUID()
+            let clientID = UUID()
             
             // add new connection to actor
-            await Clients.shared.add(connection: id, socket: ws)
+            await Clients.shared.add(connection: clientID, socket: ws)
             
             try? await ws.send("{ \"msg\": \"Server Welcome Message\" }")
             
@@ -30,14 +30,19 @@ extension Mist
                 {
                     case .subscribe(let component): do
                     {
-                        await Clients.shared.addSubscription(component, for: id)
-                        
-                        try? await ws.send("{ \"msg\": \"Subscribed to \(component)\" }")
+                        if await Clients.shared.addSubscription(component, to: clientID)
+                        {
+                            try? await ws.send("{ \"msg\": \"Subscribed to \(component)\" }")
+                        }
+                        else
+                        {
+                            try? await ws.send("{ \"error\": \"Component '\(component)' not found\" }")
+                        }
                     }
                         
                     case .unsubscribe(let component): do
                     {
-                        await Clients.shared.removeSubscription(component, for: id)
+                        await Clients.shared.removeSubscription(component, for: clientID)
                         
                         try? await ws.send("{ \"msg\": \"Unsubscribed to \(component)\" }")
                     }
@@ -48,7 +53,7 @@ extension Mist
             }
             
             // remove connection from actor on close
-            ws.onClose.whenComplete() { _ in Task { await Clients.shared.remove(connection: id) } }
+            ws.onClose.whenComplete() { _ in Task { await Clients.shared.remove(connection: clientID) } }
         }
     }
 }

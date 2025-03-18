@@ -13,9 +13,6 @@
   },
   "testTargets" : [
     {
-      "skippedTests" : [
-        "WebSocketConnection\/testSubscriptionFlow()"
-      ],
       "target" : {
         "containerPath" : "container:",
         "identifier" : "MistTests",

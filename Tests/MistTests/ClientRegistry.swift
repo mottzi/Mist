@@ -29,8 +29,12 @@ final class ClientRegistry: XCTestCase
         XCTAssertEqual(connections[0].id, clientID, "Client ID should match")
         XCTAssertEqual(connections[0].subscriptions.count, 0, "Client should not have subscriptions")
         
+        // use testing API to register component without config (for listener creation
+        await Mist.Components.shared.registerWithoutListenerForTesting(component: DummyRow1.self)
+        
         // use API to add component name to client's subscription set
-        await Mist.Clients.shared.addSubscription("MyComponent", for: clientID)
+        let added = await Mist.Clients.shared.addSubscription("DummyRow1", to: clientID)
+        XCTAssertEqual(added, true, "Component not found.")
         
         // load internal storage
         connections = await Mist.Clients.shared.connections
@@ -38,7 +42,7 @@ final class ClientRegistry: XCTestCase
         // test internal storage after adding subscription to client
         XCTAssertEqual(connections.count, 1, "Only one client should exist")
         XCTAssertEqual(connections[0].subscriptions.count, 1, "Client should have exactly one subscription")
-        XCTAssert(connections[0].subscriptions.contains("MyComponent"), "Client should be subscribed to component")
+        XCTAssert(connections[0].subscriptions.contains("DummyRow1"), "Client should be subscribed to component")
     }
 }
 

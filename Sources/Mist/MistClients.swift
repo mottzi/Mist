@@ -36,13 +36,18 @@ extension Mist.Clients
 extension Mist.Clients
 {
     // add subscription to connection
-    func addSubscription(_ component: String, for id: UUID)
+    func addSubscription(_ componentName: String, to clientID: UUID) async -> Bool
     {
-        // abort if client is not found
-        guard let index = connections.firstIndex(where: { $0.id == id }) else { return }
-
+        // abort if client doesn't exist in registry
+        guard let index = connections.firstIndex(where: { $0.id == clientID }) else { return false }
+        
+        // abort if component doesn't exist in registry
+        guard await Mist.Components.shared.hasComponent(name: componentName) else { return false }
+        
         // add component to client's subscriptions
-        connections[index].subscriptions.insert(component)
+        connections[index].subscriptions.insert(componentName)
+        
+        return true
     }
     
     // remove subscription from connection

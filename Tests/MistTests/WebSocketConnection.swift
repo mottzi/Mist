@@ -30,12 +30,12 @@ final class WebSocketConnection: XCTestCase
         
         switch message
         {
-            // ensure correct decoding
+                // ensure correct decoding
             case .subscribe(let component): do
-            {
-                // test correct decoding of component name
-                XCTAssertEqual(component, "TestComponent2", "Mist message component should match JSON component string")
-            }
+                {
+                    // test correct decoding of component name
+                    XCTAssertEqual(component, "TestComponent2", "Mist message component should match JSON component string")
+                }
                 
                 // ensure correct decoding
             default: return XCTFail("Valid but non-subscribe message")
@@ -49,7 +49,7 @@ final class WebSocketConnection: XCTestCase
         app.databases.use(.sqlite(.memory), as: .sqlite)
         
         // register multiple components with dublicate
-        let config = Mist.Configuration(app: app, components: [])
+        let config = Mist.Configuration(app: app, components: [DumbComp4133.self])
         await Mist.registerComponents(using: config)
         
         // test this client message
@@ -93,7 +93,8 @@ final class WebSocketConnection: XCTestCase
                         XCTAssertEqual(component, "DumbComp4133", "Mist message component should match JSON component string")
                         
                         // use API to add client sent component name to client's subscription set
-                        await Mist.Clients.shared.addSubscription(component, for: clientID)
+                        let added = await Mist.Clients.shared.addSubscription(component, to: clientID)
+                        XCTAssertEqual(added, true, "Component not found (or client)")
 
                         // get internal storage
                         let connections = await Mist.Clients.shared.connections
@@ -124,7 +125,17 @@ final class WebSocketConnection: XCTestCase
                 ws.send(message)
             }
         }
-            
+        
         try await app.asyncShutdown()
     }
+    
+    func testComponentUpdateFlow() async throws
+    {
+        
+    }
+}
+    
+struct DumbComp4133: Mist.Component
+{
+    static let models: [any Mist.Model.Type] = [DummyModel1.self, DummyModel2.self]
 }
