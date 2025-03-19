@@ -96,9 +96,30 @@ final class DummyModel1: Mist.Model, Content, @unchecked Sendable
     
     init() {}
     
-    init(text: String)
+    init(id: UUID? = nil, text: String)
     {
+        self.id = id
         self.text = text
+    }
+}
+
+extension DummyModel1
+{
+    struct Table: AsyncMigration
+    {
+        func prepare(on database: Database) async throws
+        {
+            try await database.schema(DummyModel1.schema)
+                .id()
+                .field("text", .string, .required)
+                .field("created", .datetime)
+                .create()
+        }
+        
+        func revert(on database: Database) async throws
+        {
+            try await database.schema(DummyModel1.schema).delete()
+        }
     }
 }
 
@@ -112,9 +133,30 @@ final class DummyModel2: Mist.Model, Content, @unchecked Sendable
     
     init() {}
     
-    init(text: String)
+    init(id: UUID? = nil, text2: String)
     {
-        self.text2 = text
+        self.id = id
+        self.text2 = text2
+    }
+}
+
+extension DummyModel2
+{
+    struct Table: AsyncMigration
+    {
+        func prepare(on database: Database) async throws
+        {
+            try await database.schema(DummyModel2.schema)
+                .id()
+                .field("text2", .string, .required)
+                .field("created", .datetime)
+                .create()
+        }
+        
+        func revert(on database: Database) async throws
+        {
+            try await database.schema(DummyModel2.schema).delete()
+        }
     }
 }
 
