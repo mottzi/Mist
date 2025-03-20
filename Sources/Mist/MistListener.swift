@@ -44,9 +44,10 @@ extension Mist
         {
             // Only update if component says it should
             guard component.shouldUpdate(for: model) else { return }
-            
+                        
             // render using ID and database
             guard let html = await component.render(id: modelID, on: db, using: renderer) else { return }
+//            let html = "<div>lol html</div>"
             
             // create update message with component data
             let message = Message.componentUpdate(
@@ -55,7 +56,7 @@ extension Mist
                 id: modelID,
                 html: html
             )
-            
+                        
             // broadcast to all connected clients
             await Clients.shared.broadcast(message)
             
