@@ -102,7 +102,7 @@ extension Mist.Component
     }
     
     // check if component should update when the provided model changes
-    static func shouldUpdate<M: Model>(for model: M) -> Bool
+    static func shouldUpdate<M: Mist.Model>(for model: M) -> Bool
     {
         return models.contains
         { componentModelType in
@@ -122,7 +122,7 @@ extension Mist
         let models: [any Model.Type]
         
         // type-erased functions
-        private let _shouldUpdate: @Sendable (Any) -> Bool
+        private let _shouldUpdate: @Sendable (any Mist.Model) -> Bool
         private let _render: @Sendable (UUID, Database, ViewRenderer) async -> String?
         
         // create type-erased component from any concrete component type
@@ -135,7 +135,6 @@ extension Mist
             // capture concrete type function
             self._shouldUpdate =
             { model in
-                guard let model = model as? any Mist.Model else { return false }
                 return C.shouldUpdate(for: model)
             }
             
@@ -147,7 +146,7 @@ extension Mist
         }
         
         // forward call to the captured function
-        func shouldUpdate(for model: Any) -> Bool
+        func shouldUpdate(for model: any Mist.Model) -> Bool
         {
             _shouldUpdate(model)
         }

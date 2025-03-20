@@ -35,12 +35,12 @@ extension Mist
             // process each component
             for component in components
             {
-                await processComponent(component, for: model, modelID: modelID, db: db, renderer: config.app.leaf.renderer)
+                await renderComponent(component, for: model, modelID: modelID, db: db, renderer: config.app.leaf.renderer)
             }
         }
         
         // Process a single component and broadcast update if needed
-        private func processComponent(_ component: AnyComponent, for model: M, modelID: UUID, db: Database, renderer: ViewRenderer) async
+        private func renderComponent(_ component: AnyComponent, for model: M, modelID: UUID, db: Database, renderer: ViewRenderer) async
         {
             // Only update if component says it should
             guard component.shouldUpdate(for: model) else { return }
