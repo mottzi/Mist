@@ -74,6 +74,13 @@ final class MistComponentsTest: XCTestCase
         
         try await app.asyncShutdown()
     }
+    
+    func testRandom() async
+    {
+        await Mist.Components.shared.registerForTesting(DummyRow2.self)
+
+        print(DummyRow2.name)
+    }
 }
 
 struct DummyRow1: Mist.Component
@@ -84,6 +91,8 @@ struct DummyRow1: Mist.Component
 struct DummyRow2: Mist.Component
 {
     static let models: [any Mist.Model.Type] = [DummyModel1.self]
+    
+    static let name: String = "lol"
 }
 
 final class DummyModel1: Mist.Model, Content, @unchecked Sendable

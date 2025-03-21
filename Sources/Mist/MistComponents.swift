@@ -15,6 +15,9 @@ extension Mist
         // type-safe mist component registration
         func register<C: Component>(component: C.Type, using config: Mist.Configuration)
         {
+            // abort if default naming was overwritten
+            // guard component.name == String(describing: C.self) else { assertionFailure("test"); return }
+            
             // abort if component name is already registered
             guard components.contains(where: { $0.name == C.name }) == false else { return }
             
@@ -58,6 +61,9 @@ extension Mist.Components
 {
     func registerForTesting<C: Mist.Component>(_ component: C.Type)
     {
+        // abort if default naming was overwritten
+        // guard component.name == String(describing: C.self) else { assertionFailure("\(String(describing: C.self)) tried to override default naming with: '\(component.name)'"); return }
+        
         // abort if component name is already registered
         guard components.contains(where: { $0.name == C.name }) == false else { return }
         
