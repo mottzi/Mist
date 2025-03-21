@@ -6,7 +6,7 @@ extension Mist.Model
     // registers db middleware listener on Fluent db changes
     static func createListener(using config: Mist.Configuration, on db: DatabaseID?)
     {
-        config.app.databases.middleware.use(Mist.Listener<Self>(config: config), on: db)
+        config.app.databases.middleware.use(Mist.Listener<Self>(using: config), on: db)
     }
 }
 
@@ -16,7 +16,13 @@ extension Mist
     struct Listener<M: Mist.Model>: AsyncModelMiddleware
     {
         let config: Mist.Configuration
+        
         let logger = Logger(label: "[Mist]")
+        
+        init(using config: Mist.Configuration)
+        {
+            self.config = config
+        }
         
         // update callback
         func update(model: M, on db: Database, next: AnyAsyncModelResponder) async throws
@@ -45,10 +51,11 @@ extension Mist
             // Only update if component says it should
             guard component.shouldUpdate(for: model) else { return }
                         
-            // render using ID and database
-            guard let html = await component.render(id: modelID, on: db, using: renderer) else { return }
-//            let html = "<div>lol html</div>"
-            
+            // render using ID and database OR test update
+            if config.testing { print("*** server rendered mock update html: <div>lol html</div>") }
+            let html = !config.testing ? await component.render(id: modelID, on: db, using: renderer) : "<div>Update</div>"
+            guard let html else { return }
+                        
             // create update message with component data
             let message = Message.componentUpdate(
                 component: component.name,

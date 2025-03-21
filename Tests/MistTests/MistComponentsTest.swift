@@ -4,7 +4,7 @@ import Fluent
 import FluentSQLiteDriver
 @testable import Mist
 
-final class ComponentRegistry: XCTestCase
+final class MistComponentsTest: XCTestCase
 {
     override func setUp() async throws
     {

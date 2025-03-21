@@ -14,7 +14,7 @@ extension Mist
             let clientID = UUID()
             
             // add new connection to actor
-            await Clients.shared.add(connection: clientID, socket: ws)
+            await Clients.shared.add(client: clientID, socket: ws)
             
             try? await ws.send("{ \"msg\": \"Server Welcome Message\" }")
             
@@ -53,7 +53,7 @@ extension Mist
             }
             
             // remove connection from actor on close
-            ws.onClose.whenComplete() { _ in Task { await Clients.shared.remove(connection: clientID) } }
+            ws.onClose.whenComplete() { _ in Task { await Clients.shared.remove(client: clientID) } }
         }
     }
 }

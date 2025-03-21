@@ -1,11 +1,10 @@
 import XCTest
 import Vapor
-import Fluent
 import FluentSQLiteDriver
 @testable import WebSocketKit
 @testable import Mist
 
-final class ClientRegistry: XCTestCase
+final class MistClientsTests: XCTestCase
 {
     override func setUp() async throws
     {
@@ -19,15 +18,15 @@ final class ClientRegistry: XCTestCase
         let clientID = UUID()
         
         // use API to add test client to internal storage
-        await Mist.Clients.shared.add(connection: clientID, socket: WebSocket.Dummy)
+        await Mist.Clients.shared.add(client: clientID, socket: WebSocket.dummy)
         
         // load internal storage
-        var connections = await Mist.Clients.shared.connections
+        var clients = await Mist.Clients.shared.clients
         
         // test internal storage after adding client
-        XCTAssertEqual(connections.count, 1, "Only one client should exist")
-        XCTAssertEqual(connections[0].id, clientID, "Client ID should match")
-        XCTAssertEqual(connections[0].subscriptions.count, 0, "Client should not have subscriptions")
+        XCTAssertEqual(clients.count, 1, "Only one client should exist")
+        XCTAssertEqual(clients[0].id, clientID, "Client ID should match")
+        XCTAssertEqual(clients[0].subscriptions.count, 0, "Client should not have subscriptions")
         
         // use testing API to register component without config (for listener creation
         await Mist.Components.shared.registerWithoutListenerForTesting(component: DummyRow1.self)
@@ -37,18 +36,18 @@ final class ClientRegistry: XCTestCase
         XCTAssertEqual(added, true, "Component not found.")
         
         // load internal storage
-        connections = await Mist.Clients.shared.connections
+        clients = await Mist.Clients.shared.clients
         
         // test internal storage after adding subscription to client
-        XCTAssertEqual(connections.count, 1, "Only one client should exist")
-        XCTAssertEqual(connections[0].subscriptions.count, 1, "Client should have exactly one subscription")
-        XCTAssert(connections[0].subscriptions.contains("DummyRow1"), "Client should be subscribed to component")
+        XCTAssertEqual(clients.count, 1, "Only one client should exist")
+        XCTAssertEqual(clients[0].subscriptions.count, 1, "Client should have exactly one subscription")
+        XCTAssert(clients[0].subscriptions.contains("DummyRow1"), "Client should be subscribed to component")
     }
 }
 
 extension WebSocket
 {
-    static var Dummy: WebSocket
+    static var dummy: WebSocket
     {
         WebSocket(channel: EmbeddedChannel(loop: EmbeddedEventLoop()), type: PeerType.server)
     }

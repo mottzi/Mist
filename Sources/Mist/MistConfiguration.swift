@@ -11,14 +11,17 @@ public extension Mist
         // reference to application
         let app: Application
         
+        let testing: Bool
+        
         let components: [any Mist.Component.Type]
         
         // initialize with application
-        public init(app: Application, components: [any Mist.Component.Type], db: DatabaseID? = nil)
+        public init(app: Application, components: [any Mist.Component.Type], db: DatabaseID? = nil, testing: Bool = false)
         {
             self.app = app
             self.db = db
             self.components = components
+            self.testing = testing
         }
     }
 }
