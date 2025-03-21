@@ -37,7 +37,7 @@ final class MistFlowTests: XCTestCase
             await Mist.Clients.shared.add(client: clientID, socket: ws)
             
             // get internal storage
-            let clients = await Mist.Clients.shared.clients
+            let clients = await Mist.Clients.shared.getClients()
             
             // test internal storage after adding client
             XCTAssertEqual(clients.count, 1, "Only one client should exist")
@@ -68,7 +68,7 @@ final class MistFlowTests: XCTestCase
                         XCTAssertEqual(added, true, "Component not found (or client)")
 
                         // get internal storage
-                        let clients = await Mist.Clients.shared.clients
+                        let clients = await Mist.Clients.shared.getClients()
                         
                         // test internal storage after adding subscription
                         XCTAssertEqual(clients.count, 1, "Only one client should exist")

@@ -40,14 +40,14 @@ extension Mist
                         }
                     }
                         
-                    case .unsubscribe(let component): do
+                    /*case .unsubscribe(let component): do
                     {
                         await Clients.shared.removeSubscription(component, for: clientID)
                         
                         try? await ws.send("{ \"msg\": \"Unsubscribed to \(component)\" }")
-                    }
+                    }*/
                         
-                        // server does not handle other message types
+                    // server does not handle other message types
                     default: return
                 }
             }

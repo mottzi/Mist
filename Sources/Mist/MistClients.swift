@@ -7,7 +7,17 @@ extension Mist
     {
         static let shared = Clients()
         
-        internal var clients: [Client] = []
+        private var clients: [Client] = []
+        
+        func getClients() -> [Client]
+        {
+            return clients
+        }
+        
+        func getSubscribers(of component: String) -> [Client]
+        {
+            return clients.filter { $0.subscriptions.contains(component) }
+        }
     }
 }
 
@@ -38,6 +48,7 @@ extension Mist.Clients
 extension Mist.Clients
 {
     // add subscription to connection
+    @discardableResult
     func addSubscription(_ component: String, to client: UUID) async -> Bool
     {
         // abort if component doesn't exist in registry
@@ -47,20 +58,20 @@ extension Mist.Clients
         guard let index = clients.firstIndex(where: { $0.id == client }) else { return false }
         
         // add component to client's subscriptions
-        clients[index].subscriptions.insert(component)
+        let result = clients[index].subscriptions.insert(component)
         
-        return true
+        return result.inserted
     }
     
     // remove subscription from connection
-    func removeSubscription(_ component: String, for id: UUID)
+    /*func removeSubscription(_ component: String, for id: UUID)
     {
         // abort if client is not found
         guard let index = clients.firstIndex(where: { $0.id == id }) else { return }
         
         // remove component from client's subscriptions
         clients[index].subscriptions.remove(component)
-    }
+    }*/
 }
 
 // broadcasting
@@ -75,7 +86,7 @@ extension Mist.Clients
         guard let jsonString = String(data: jsonData, encoding: .utf8) else { return }
         
         // get subscribed clients of component
-        let subscribers = clients.filter { $0.subscriptions.contains(component) }
+        let subscribers = getSubscribers(of: component)
         
         // send update message payload
         for subscriber in subscribers { Task { try? await subscriber.socket.send(jsonString) } }

@@ -12,36 +12,120 @@ final class MistClientsTests: XCTestCase
         await Mist.Clients.shared.resetForTesting()
     }
     
-    func testInternalStorage() async
+    // tests correct adding of new client
+    func testAddClient() async
     {
-        // create test client
-        let clientID = UUID()
-        
-        // use API to add test client to internal storage
-        await Mist.Clients.shared.add(client: clientID, socket: WebSocket.dummy)
+        // add new test client
+        let clientID = await addTestClient()
         
         // load internal storage
-        var clients = await Mist.Clients.shared.clients
+        let clients = await Mist.Clients.shared.getClients()
         
         // test internal storage after adding client
         XCTAssertEqual(clients.count, 1, "Only one client should exist")
         XCTAssertEqual(clients[0].id, clientID, "Client ID should match")
         XCTAssertEqual(clients[0].subscriptions.count, 0, "Client should not have subscriptions")
+    }
+    
+    // tests correct removal of client
+    func testRemoveClient() async
+    {
+        // add test client
+        let clientID = await addTestClient()
         
-        // use testing API to register component without config (for listener creation
-        await Mist.Components.shared.registerWithoutListenerForTesting(component: DummyRow1.self)
-        
-        // use API to add component name to client's subscription set
-        let added = await Mist.Clients.shared.addSubscription("DummyRow1", to: clientID)
-        XCTAssertEqual(added, true, "Component not found.")
+        // remove test client
+        await Mist.Clients.shared.remove(client: clientID)
         
         // load internal storage
-        clients = await Mist.Clients.shared.clients
+        let clients = await Mist.Clients.shared.getClients()
         
-        // test internal storage after adding subscription to client
-        XCTAssertEqual(clients.count, 1, "Only one client should exist")
-        XCTAssertEqual(clients[0].subscriptions.count, 1, "Client should have exactly one subscription")
-        XCTAssert(clients[0].subscriptions.contains("DummyRow1"), "Client should be subscribed to component")
+        // test internal storage
+        XCTAssertEqual(clients.count, 0, "No clients should exist")
+    }
+    
+    // tests correct component subscribtion of clients
+    func testAddSubscription() async
+    {
+        // create test client
+        let clientID0 = await addTestClient()
+        let clientID1 = await addTestClient()
+        let clientID2 = await addTestClient()
+        
+        // use testing API to register component
+        await Mist.Components.shared.registerForTesting(DummyRow1.self)
+        await Mist.Components.shared.registerForTesting(DummyRow2.self)
+        
+        // use API to add component name to client's subscription set
+        var inserted: Bool
+        
+        // valid
+        inserted = await Mist.Clients.shared.addSubscription("DummyRow1", to: clientID0)
+        XCTAssertEqual(inserted, true)
+        
+        // valid
+        inserted = await Mist.Clients.shared.addSubscription("DummyRow1", to: clientID1)
+        XCTAssertEqual(inserted, true)
+        
+        // valid
+        inserted = await Mist.Clients.shared.addSubscription("DummyRow2", to: clientID1)
+        XCTAssertEqual(inserted, true)
+        
+        // invalid (already subscribed)
+        inserted = await Mist.Clients.shared.addSubscription("DummyRow2", to: clientID1)
+        XCTAssertEqual(inserted, false)
+
+        // invalid (no such component)
+        inserted = await Mist.Clients.shared.addSubscription("DummyRow3", to: clientID2)
+        XCTAssertEqual(inserted, false)
+        
+        // invalid (no such client)
+        inserted = await Mist.Clients.shared.addSubscription("DummyRow3", to: UUID())
+        XCTAssertEqual(inserted, false)
+
+        // load internal storage
+        let clients = await Mist.Clients.shared.getClients()
+        
+        // test internal storage after adding subscriptions to clients
+        XCTAssertEqual(clients.count, 3, "Only 4 clients should exist")
+        
+        XCTAssertEqual(clients[0].subscriptions.count, 1)
+        XCTAssert(clients[0].subscriptions.contains("DummyRow1"))
+        
+        XCTAssertEqual(clients[1].subscriptions.count, 2)
+        XCTAssert(clients[1].subscriptions.contains("DummyRow1"))
+        XCTAssert(clients[1].subscriptions.contains("DummyRow2"))
+        
+        XCTAssertEqual(clients[2].subscriptions.count, 0)
+    }
+    
+    // tests correct lookup of component subscribed clients
+    func testGetSubscribers() async
+    {
+        let clientID0 = await addTestClient()
+        let clientID1 = await addTestClient()
+        let clientID2 = await addTestClient()
+
+        // use testing API to register components
+        await Mist.Components.shared.registerForTesting(DummyRow1.self)
+        await Mist.Components.shared.registerForTesting(DummyRow2.self)
+    
+        await Mist.Clients.shared.addSubscription("DummyRow1", to: clientID0)
+        
+        await Mist.Clients.shared.addSubscription("DummyRow1", to: clientID1)
+        await Mist.Clients.shared.addSubscription("DummyRow2", to: clientID1)
+        await Mist.Clients.shared.addSubscription("DummyRow2", to: clientID1)
+        
+        await Mist.Clients.shared.addSubscription("DummyRow3", to: clientID2)
+        await Mist.Clients.shared.addSubscription("DummyRow3", to: UUID())
+        
+        let subscribers1 = await Mist.Clients.shared.getSubscribers(of: "DummyRow1").map { $0.id }
+        XCTAssertEqual(subscribers1, [clientID0, clientID1])
+        
+        let subscribers2 = await Mist.Clients.shared.getSubscribers(of: "DummyRow2").map { $0.id }
+        XCTAssertEqual(subscribers2, [clientID1])
+        
+        let subscribers3 = await Mist.Clients.shared.getSubscribers(of: "DummyRow3").map { $0.id }
+        XCTAssertEqual(subscribers3, [])
     }
 }
 
@@ -50,5 +134,19 @@ extension WebSocket
     static var dummy: WebSocket
     {
         WebSocket(channel: EmbeddedChannel(loop: EmbeddedEventLoop()), type: PeerType.server)
+    }
+}
+
+extension MistClientsTests
+{
+    private func addTestClient() async -> UUID
+    {
+        // create test client
+        let clientID = UUID()
+        
+        // use API to add test client to internal storage
+        await Mist.Clients.shared.add(client: clientID, socket: WebSocket.dummy)
+        
+        return clientID
     }
 }

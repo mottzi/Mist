@@ -56,7 +56,7 @@ extension Mist
 #if DEBUG
 extension Mist.Components
 {
-    func registerWithoutListenerForTesting<C: Mist.Component>(component: C.Type)
+    func registerForTesting<C: Mist.Component>(_ component: C.Type)
     {
         // abort if component name is already registered
         guard components.contains(where: { $0.name == C.name }) == false else { return }
