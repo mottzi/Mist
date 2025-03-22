@@ -1,4 +1,4 @@
-// swift-tools-version: 6.0.0
+// swift-tools-version: 6.0
 import PackageDescription
 
 let package = Package(
@@ -32,7 +32,6 @@ let package = Package(
             dependencies: [
                 "Mist",
                 .product(name: "FluentSQLiteDriver", package: "fluent-sqlite-driver"),
-                .product(name: "XCTVapor", package: "vapor"),
             ]
         )
     ]

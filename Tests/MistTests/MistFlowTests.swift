@@ -1,4 +1,4 @@
-import XCTVapor
+import XCTest
 import Vapor
 import Fluent
 import FluentSQLiteDriver

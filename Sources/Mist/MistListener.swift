@@ -1,4 +1,4 @@
-@preconcurrency import Vapor
+import Vapor
 import Fluent
 
 extension Mist.Model
@@ -16,7 +16,6 @@ extension Mist
     struct Listener<M: Mist.Model>: AsyncModelMiddleware
     {
         let config: Mist.Configuration
-        
         let logger = Logger(label: "[Mist]")
         
         init(using config: Mist.Configuration)
