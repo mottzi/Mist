@@ -10,6 +10,7 @@ final class MistClientsTests: XCTestCase
     {
         // reset singletons before each test
         await Mist.Clients.shared.resetForTesting()
+        await Mist.Components.shared.resetForTesting()
     }
     
     // tests correct adding of new client
