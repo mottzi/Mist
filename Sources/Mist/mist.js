@@ -1,5 +1,3 @@
-/* Make a copy of this file (mist.js) in: '/Public' */
-
 class MistSocket
 {
     constructor()

@@ -34,5 +34,6 @@ let package = Package(
                 .product(name: "FluentSQLiteDriver", package: "fluent-sqlite-driver"),
             ]
         )
-    ]
+    ],
+    swiftLanguageModes: [.v6]
 )
