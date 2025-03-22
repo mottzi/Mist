@@ -6,7 +6,7 @@ extension Mist
     enum Message: Codable
     {
         case subscribe(component: String)
-        case unsubscribe(component: String)
+        // case unsubscribe(component: String)
         case componentUpdate(component: String, action: String, id: UUID?, html: String)
 
         private enum CodingKeys: String, CodingKey
@@ -29,9 +29,9 @@ extension Mist
                     try container.encode("subscribe", forKey: .type)
                     try container.encode(component, forKey: .component)
                     
-                case .unsubscribe(let component):
+                /*case .unsubscribe(let component):
                     try container.encode("unsubscribe", forKey: .type)
-                    try container.encode(component, forKey: .component)
+                    try container.encode(component, forKey: .component)*/
                     
                 case .componentUpdate(let component, let action, let id, let html):
                     try container.encode("componentUpdate", forKey: .type)
@@ -54,9 +54,9 @@ extension Mist
                     let component = try container.decode(String.self, forKey: .component)
                     self = .subscribe(component: component)
                     
-                case "unsubscribe":
+                /*case "unsubscribe":
                     let component = try container.decode(String.self, forKey: .component)
-                    self = .unsubscribe(component: component)
+                    self = .unsubscribe(component: component)*/
                     
                 case "componentUpdate":
                     let component = try container.decode(String.self, forKey: .component)
