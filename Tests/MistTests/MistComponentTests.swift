@@ -92,6 +92,8 @@ final class MistComponentTests: XCTestCase
         
         // verify that both models share the same ID
         XCTAssertEqual(dummyModel1["id"] as? String, dummyModel2["id"] as? String, "Both models should have the same ID")
+        
+        try await app.asyncShutdown()
     }
     
     func testRendering() async throws
@@ -139,7 +141,7 @@ final class MistComponentTests: XCTestCase
             <td>World</td>
         </tr>
         """,
-                       "HTML did not match expected output")
+        "HTML did not match expected output")
         
         // Optional: Print rendered HTML for inspection
         print("Rendered HTML:\n\(html)")

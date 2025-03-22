@@ -13,10 +13,6 @@
   },
   "testTargets" : [
     {
-      "skippedTests" : [
-        "MistComponentTests",
-        "MistFlowTests"
-      ],
       "target" : {
         "containerPath" : "container:",
         "identifier" : "MistTests",
