@@ -93,7 +93,7 @@ public extension Mist
     {
         let component: ModelContainer
         
-        init(component: ModelContainer) { self.component = component }
+        public init(component: ModelContainer) { self.component = component }
     }
     
     // collection context
@@ -101,6 +101,6 @@ public extension Mist
     {
         let components: [ModelContainer]
         
-        init(components: [ModelContainer]) { self.components = components }
+        public init(components: [ModelContainer]) { self.components = components }
     }
 }
