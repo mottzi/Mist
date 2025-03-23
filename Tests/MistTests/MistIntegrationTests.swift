@@ -107,9 +107,6 @@ final class MistIntegrationTests: XCTestCase
         // test timeout duration
         let testTimeout: TimeInterval = 2.0
         
-        // create a model ID that we'll use for testing
-        let modelID = UUID()
-        
         // set up application and database
         let app = try await Application.make(.testing)
         app.databases.use(.sqlite(.memory), as: .sqlite)
@@ -124,6 +121,14 @@ final class MistIntegrationTests: XCTestCase
         
         // subscription message
         let subscriptionMessage = #"{ "type": "subscribe", "component": "TestComponent" }"#
+        
+        // create component models
+        let modelID = UUID()
+        
+        let model1 = DummyModel1(id: modelID, text: "Initial text")
+        let model2 = DummyModel2(id: modelID, text2: "Initial text 2")
+        
+        let model1UpdatedText = "Component Model Updated!"
         
         // actor to safely track test state across async boundaries
         actor TestState
@@ -166,18 +171,14 @@ final class MistIntegrationTests: XCTestCase
                 // create and update models to trigger listener
                 print("*** Server creating and updating models...")
                 
-                // create models with the test ID
-                let model1 = DummyModel1(id: modelID, text: "Initial text")
-                let model2 = DummyModel2(id: modelID, text2: "Initial text 2")
-                
                 do
                 {
-                    // save models to database
+                    // save component models to database
                     try await model1.save(on: request.db)
                     try await model2.save(on: request.db)
                     
-                    // update model to trigger component listener
-                    model1.text = "Updated text"
+                    // update component model to trigger component update
+                    model1.text = model1UpdatedText
                     try await model1.save(on: request.db)
                 }
                 catch
@@ -218,7 +219,7 @@ final class MistIntegrationTests: XCTestCase
                 """
                 <div mist-component="TestComponent" mist-id="\(modelID.uuidString)">
                     <span>\(modelID.uuidString)</span>
-                    <span>Updated text</span>
+                    <span>\(model1UpdatedText)</span>
                     <span>Initial text 2</span>
                 </div>
                 """ else { return await test.fail("Not expected updated HTML") }
