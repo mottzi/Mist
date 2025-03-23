@@ -2,6 +2,7 @@ import Vapor
 import Fluent
 @testable import LeafKit
 
+// public component protocol
 public extension Mist
 {
     // mist component protocol
@@ -29,10 +30,10 @@ public extension Mist.Component
 }
     
 // default context
-extension Mist.Component
+public extension Mist.Component
 {
     // create single component context
-    public static func makeContext(of componentID: UUID, in db: Database) async -> Mist.SingleComponentContext?
+    static func makeContext(of componentID: UUID, in db: Database) async -> Mist.SingleComponentContext?
     {
         // data container for dynamic multi model context creation
         var componentData = Mist.ModelContainer()
@@ -58,11 +59,11 @@ extension Mist.Component
     }
     
     // create collection context for multiple components
-    public static func makeContext(ofAll db: Database) async -> Mist.MultipleComponentContext?
+    static func makeContext(ofAll db: Database) async -> Mist.MultipleComponentContext?
     {
         // array of data containes for dynamic multi model context creation
         var componentDataCollection: [Mist.ModelContainer] = []
-
+        
         // abort if not one model type was provided
         guard let primaryModelType = models.first else { return nil }
         
@@ -88,7 +89,11 @@ extension Mist.Component
         // return context of all components and their collected model data
         return Mist.MultipleComponentContext(components: componentDataCollection)
     }
-    
+}
+
+// internal rendering
+extension Mist.Component
+{
     // render component using dynamically generated template context
     static func render(id: UUID, on db: Database, using renderer: ViewRenderer) async -> String?
     {
@@ -142,6 +147,7 @@ extension Mist
             // capture concrete type function
             self._render =
             { id, db, renderer in
+                print("*** Server rendering '\(C.name)' (file template)... ")
                 return await C.render(id: id, on: db, using: renderer)
             }
         }

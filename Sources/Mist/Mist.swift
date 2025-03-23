@@ -18,15 +18,7 @@ public extension Mist
         // register configured components
         for component in config.components
         {
-            // Check if component conforms to TestableComponent protocol first
-            if let testableComponent = component as? any TestableComponent.Type
-            {
-                await Components.shared.register(testableComponent: testableComponent, using: config)
-            }
-            else
-            {
-                await Components.shared.register(component: component, using: config)
-            }            
+            await Components.shared.register(component: component, using: config)
         }
     }
 }

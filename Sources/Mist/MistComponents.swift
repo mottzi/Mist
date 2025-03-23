@@ -39,7 +39,16 @@ extension Mist
             }
             
             // add new type erased mist component to storage
-            components.append(AnyComponent(component))
+            if let testableComponent = component as? any TestableComponent.Type
+            {
+                // for test components
+                components.append(AnyComponent(testableComponent))
+            }
+            else
+            {
+                // for regular components
+                components.append(AnyComponent(component))
+            }            
         }
         
         // retrieve all components that use a specific model
@@ -59,33 +68,6 @@ extension Mist
 #if DEBUG
 extension Mist.Components
 {
-    // type-safe testable mist component registration
-    func register<C: Mist.TestableComponent>(testableComponent component: C.Type, using config: Mist.Configuration)
-    {
-        // abort if component name is already registered
-        guard components.contains(where: { $0.name == C.name }) == false else { return }
-        
-        // register database listeners for component models
-        for model in component.models
-        {
-            // search for component using this model
-            let isModelUsed = components.contains()
-            {
-                $0.models.contains { ObjectIdentifier($0) == ObjectIdentifier(model) }
-            }
-            
-            // if this model is not yet used
-            if isModelUsed == false
-            {
-                // register db model listener middleware
-                model.createListener(using: config, on: config.db)
-            }
-        }
-        
-        // add new type erased mist component to storage
-        components.append(Mist.AnyComponent(component))
-    }
-    
     func registerWOListenerForTesting<C: Mist.Component>(_ component: C.Type)
     {
         // abort if component name is already registered
