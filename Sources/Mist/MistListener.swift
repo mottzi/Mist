@@ -26,7 +26,7 @@ extension Mist
         // update callback
         func update(model: M, on db: Database, next: AnyAsyncModelResponder) async throws
         {
-            logger.warning("Listener for model '\(String(describing: model.self))' was triggered.")
+            print("*** Listener for model '\(String(describing: model.self))' was triggered.")
             
             // perform middleware chain
             try await next.update(model, on: db)
@@ -49,14 +49,12 @@ extension Mist
         {
             // Only update if component says it should
             guard component.shouldUpdate(for: model) else { return }
-                        
+                 
             // render using ID and database OR test update
-            if config.testing { print("*** server rendered mock update html: <div>Update</div>") }
-            let html = !config.testing ? await component.render(id: modelID, on: db, using: renderer) : "<div>Update</div>"
-            guard let html else { return }
+            guard let html = await component.render(id: modelID, on: db, using: renderer) else { return }
                         
             // create update message with component data
-            let message = Message.componentUpdate(
+            let message = Message.update(
                 component: component.name,
                 action: "update",
                 id: modelID,
@@ -64,9 +62,7 @@ extension Mist
             )
                         
             // broadcast to all connected clients
-            await Clients.shared.broadcast(message)
-            
-            logger.warning("Broadcasting Component '\(component.name)'")
+            await Clients.shared.broadcast(message)            
         }
     }
 }

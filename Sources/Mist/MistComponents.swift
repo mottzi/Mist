@@ -13,7 +13,7 @@ extension Mist
         private var components: [AnyComponent] = []
 
         // type-safe mist component registration
-        func register<C: Component>(component: C.Type, using config: Mist.Configuration)
+        func register<C: Mist.Component>(component: C.Type, using config: Mist.Configuration)
         {
             // abort if default naming was overwritten
             // guard component.name == String(describing: C.self) else { assertionFailure("test"); return }
@@ -59,11 +59,35 @@ extension Mist
 #if DEBUG
 extension Mist.Components
 {
-    func registerForTesting<C: Mist.Component>(_ component: C.Type)
+    // type-safe testable mist component registration
+    func register<C: Mist.TestableComponent>(testableComponent component: C.Type, using config: Mist.Configuration)
     {
-        // abort if default naming was overwritten
-        // guard component.name == String(describing: C.self) else { assertionFailure("\(String(describing: C.self)) tried to override default naming with: '\(component.name)'"); return }
+        // abort if component name is already registered
+        guard components.contains(where: { $0.name == C.name }) == false else { return }
         
+        // register database listeners for component models
+        for model in component.models
+        {
+            // search for component using this model
+            let isModelUsed = components.contains()
+            {
+                $0.models.contains { ObjectIdentifier($0) == ObjectIdentifier(model) }
+            }
+            
+            // if this model is not yet used
+            if isModelUsed == false
+            {
+                // register db model listener middleware
+                model.createListener(using: config, on: config.db)
+            }
+        }
+        
+        // add new type erased mist component to storage
+        components.append(Mist.AnyComponent(component))
+    }
+    
+    func registerWOListenerForTesting<C: Mist.Component>(_ component: C.Type)
+    {
         // abort if component name is already registered
         guard components.contains(where: { $0.name == C.name }) == false else { return }
         

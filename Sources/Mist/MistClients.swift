@@ -60,18 +60,9 @@ extension Mist.Clients
         // add component to client's subscriptions
         let result = clients[index].subscriptions.insert(component)
         
+        // return true if added, false if already present
         return result.inserted
     }
-    
-    // remove subscription from connection
-    /*func removeSubscription(_ component: String, for id: UUID)
-    {
-        // abort if client is not found
-        guard let index = clients.firstIndex(where: { $0.id == id }) else { return }
-        
-        // remove component from client's subscriptions
-        clients[index].subscriptions.remove(component)
-    }*/
 }
 
 // broadcasting
@@ -81,7 +72,7 @@ extension Mist.Clients
     func broadcast(_ message: Mist.Message) async
     {
         // encode component update message
-        guard case .componentUpdate(let component, _, _, _) = message else { return }
+        guard case .update(let component, _, _, _) = message else { return }
         guard let jsonData = try? JSONEncoder().encode(message) else { return }
         guard let jsonString = String(data: jsonData, encoding: .utf8) else { return }
         

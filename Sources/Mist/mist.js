@@ -99,7 +99,7 @@ class MistSocket
                 console.log(`RAW: ${event.data}`);
                 const data = JSON.parse(event.data);
                 
-                if (data.type === 'componentUpdate')
+                if (data.type === 'update')
                 {
                     const elements = document.querySelectorAll(`[mist-component="${data.component}"][mist-id="${data.id}"]`);
                     

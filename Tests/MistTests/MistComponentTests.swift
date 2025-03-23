@@ -150,6 +150,7 @@ final class MistComponentTests: XCTestCase
     }
 }
 
+#if DEBUG
 func renderLeafForTesting<E: Encodable>(_ templateString: String, with context: E) throws -> String
 {
     // 1. Convert Encodable context to LeafData
@@ -204,3 +205,4 @@ private func convertToLeafData(_ value: Any) -> LeafData
         default: return .nil(.string)
     }
 }
+#endif

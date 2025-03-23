@@ -4,7 +4,7 @@ import Fluent
 import FluentSQLiteDriver
 @testable import Mist
 
-final class MistFlowTests: XCTestCase
+final class MistIntegrationTests: XCTestCase
 {
     override func setUp() async throws
     {
@@ -119,11 +119,11 @@ final class MistFlowTests: XCTestCase
         try await app.autoMigrate()
         
         // configure mist with our test component
-        let config = Mist.Configuration(for: app, using: [DumbComp4133.self], testing: true)
+        let config = Mist.Configuration(for: app, using: [TestComponent.self], testing: true)
         await Mist.registerComponents(using: config)
         
         // subscription message
-        let subscriptionMessage = #"{ "type": "subscribe", "component": "DumbComp4133" }"#
+        let subscriptionMessage = #"{ "type": "subscribe", "component": "TestComponent" }"#
         
         // actor to safely track test state across async boundaries
         actor TestState
@@ -148,7 +148,7 @@ final class MistFlowTests: XCTestCase
             // handle client messages
             ws.onText()
             { ws, text async in
-                print("*** Server received: \(text)")
+                print("*** Server receiving: \(text)")
                 
                 // decode subscription message
                 guard let data = text.data(using: .utf8),
@@ -164,7 +164,7 @@ final class MistFlowTests: XCTestCase
                 guard added else { return await test.fail("Failed to add subscription") }
                 
                 // create and update models to trigger listener
-                print("*** Creating and updating models")
+                print("*** Server creating and updating models...")
                 
                 // create models with the test ID
                 let model1 = DummyModel1(id: modelID, text: "Initial text")
@@ -195,25 +195,34 @@ final class MistFlowTests: XCTestCase
         try await WebSocket.connect(host: "localhost", port: 8080, path: "/socket", on: app.eventLoopGroup)
         { ws async in
             // Send subscription message when connected
-            print("*** Client sending subscription message")
+            print("*** Client sending: \(subscriptionMessage)")
             do { try await ws.send(subscriptionMessage) } catch { return await test.fail("Failed to send subscription message") }
             
             // Handle incoming messages from server
             ws.onText
             { ws, text async in
-                print("*** Client received: \(text)")
+                print("*** Client received server message...")
                 
                 // decode to Mist.Message
                 guard let data = text.data(using: .utf8) else { return await test.fail("Error decoding") }
                 guard let message = try? JSONDecoder().decode(Mist.Message.self, from: data) else { return await test.fail("Error decoding") }
   
                 // verify update message
-                guard case .componentUpdate(let component, _, let id, let html) = message else { return await test.fail("Wrong Mist.Message received") }
-                guard component == "DumbComp4133" else { return await test.fail("Wrong Component received") }
+                guard case .update(let component, _, let id, let html) = message else { return await test.fail("Wrong Mist.Message received") }
+                guard component == "TestComponent" else { return await test.fail("Wrong Component received") }
                 guard id == modelID else { return await test.fail("Wrong model ID received") }
                 
-                print("*** HTML: \(html)")
-                
+                print("*** Client received HTML:\n\(html)")
+
+                guard html ==
+                """
+                <div mist-component="TestComponent" mist-id="\(modelID.uuidString)">
+                    <span>\(modelID.uuidString)</span>
+                    <span>Updated text</span>
+                    <span>Initial text 2</span>
+                </div>
+                """ else { return await test.fail("Not expected updated HTML") }
+        
                 // test finished
                 await test.pass()
             }
@@ -254,4 +263,20 @@ final class MistFlowTests: XCTestCase
 struct DumbComp4133: Mist.Component
 {
     static let models: [any Mist.Model.Type] = [DummyModel1.self, DummyModel2.self]
+}
+
+public struct TestComponent: Mist.TestableComponent
+{    
+    public static let models: [any Mist.Model.Type] = [DummyModel1.self, DummyModel2.self]
+        
+    public static func templateStringLiteral(id: UUID) -> String
+    {
+        """
+        <div mist-component="TestComponent" mist-id="\(id)">
+            <span>#(component.dummymodel1.id)</span>
+            <span>#(component.dummymodel1.text)</span>
+            <span>#(component.dummymodel2.text2)</span>
+        </div>
+        """
+    }
 }

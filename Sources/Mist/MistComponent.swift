@@ -1,5 +1,6 @@
 import Vapor
 import Fluent
+@testable import LeafKit
 
 public extension Mist
 {
@@ -141,7 +142,7 @@ extension Mist
             // capture concrete type function
             self._render =
             { id, db, renderer in
-                await C.render(id: id, on: db, using: renderer)
+                return await C.render(id: id, on: db, using: renderer)
             }
         }
         
@@ -158,3 +159,99 @@ extension Mist
         }
     }
 }
+
+#if DEBUG
+extension Mist
+{
+    protocol TestableComponent: Mist.Component
+    {
+        static func templateStringLiteral(id: UUID) -> String
+    }
+}
+
+extension Mist.AnyComponent
+{
+    // create type-erased component from any concrete component type
+    init<C: Mist.TestableComponent>(_ component: C.Type)
+    {
+        self.name = C.name
+        self.template = C.template
+        self.models = C.models
+        
+        // capture concrete type function
+        self._shouldUpdate =
+        { model in
+            return C.shouldUpdate(for: model)
+        }
+        
+        // capture concrete type function
+        self._render =
+        { id, db, renderer in
+            print("*** Server rendering '\(C.name)' (string literal template)... ")
+            
+            // create dynamic template data context
+            guard let context = await C.makeContext(of: id, in: db) else { return nil }
+            
+            // render testable component using its in-memory template string literal
+            guard let html = try? renderLeafForTesting(C.templateStringLiteral(id: id), with: context) else { return nil }
+            
+            return html
+        }
+    }
+}
+
+private func renderLeafForTesting<E: Encodable>(_ templateString: String, with context: E) throws -> String
+{
+    // 1. Convert Encodable context to LeafData
+    let contextData = try JSONEncoder().encode(context)
+    let dict = try JSONSerialization.jsonObject(with: contextData) as? [String: Any] ?? [:]
+    let leafContext = convertDictionaryToLeafData(dict)
+    
+    // 2. Set up LeafKit components for direct rendering
+    var lexer = LeafLexer(name: "inline-template", template: templateString)
+    let tokens = try lexer.lex()
+    
+    var parser = LeafParser(name: "inline-template", tokens: tokens)
+    let ast = try parser.parse()
+    
+    var serializer = LeafSerializer(ast: ast, ignoreUnfoundImports: false)
+    
+    // 3. Perform the serialization
+    let buffer = try serializer.serialize(context: leafContext)
+    
+    // 4. Convert ByteBuffer to String
+    return buffer.getString(at: buffer.readerIndex, length: buffer.readableBytes) ?? ""
+}
+
+// Recursively converts a dictionary with Any values to a dictionary with LeafData values
+private func convertDictionaryToLeafData(_ dictionary: [String: Any]) -> [String: LeafData]
+{
+    var result = [String: LeafData]()
+    
+    for (key, value) in dictionary
+    {
+        result[key] = convertToLeafData(value)
+    }
+    
+    return result
+}
+
+// Converts a single value to LeafData
+private func convertToLeafData(_ value: Any) -> LeafData
+{
+    switch value
+    {
+        case let string as String: return .string(string)
+        case let int as Int: return .int(int)
+        case let double as Double: return .double(double)
+        case let bool as Bool: return .bool(bool)
+        case let array as [Any]: return .array(array.map { convertToLeafData($0) })
+        case let dict as [String: Any]: return .dictionary(convertDictionaryToLeafData(dict))
+        case let date as Date: return .double(date.timeIntervalSince1970)
+        case let uuid as UUID: return .string(uuid.uuidString)
+        case let data as Data: return .data(data)
+        case is NSNull: return .nil(.string)
+        default: return .nil(.string)
+    }
+}
+#endif

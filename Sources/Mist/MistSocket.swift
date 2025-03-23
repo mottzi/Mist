@@ -22,33 +22,17 @@ extension Mist
             ws.onText()
             { ws, text async in
                 
-                // abort if message is not of type Mist.Message
+                // abort if message is not of type Mist.Message.subscribe
                 guard let data = text.data(using: .utf8) else { return }
                 guard let message = try? JSONDecoder().decode(Message.self, from: data) else { return }
-                
-                switch message
+                guard case .subscribe(let component) = message else { return }
+                        
+                // and component subscription to client
+                switch await Clients.shared.addSubscription(component, to: clientID)
                 {
-                    case .subscribe(let component): do
-                    {
-                        if await Clients.shared.addSubscription(component, to: clientID)
-                        {
-                            try? await ws.send("{ \"msg\": \"Subscribed to \(component)\" }")
-                        }
-                        else
-                        {
-                            try? await ws.send("{ \"error\": \"Component '\(component)' not found\" }")
-                        }
-                    }
-                        
-                    /*case .unsubscribe(let component): do
-                    {
-                        await Clients.shared.removeSubscription(component, for: clientID)
-                        
-                        try? await ws.send("{ \"msg\": \"Unsubscribed to \(component)\" }")
-                    }*/
-                        
-                    // server does not handle other message types
-                    default: return
+                    // send confirmation message
+                    case true: try? await ws.send("{ \"msg\": \"Subscribed to '\(component)'\" }")
+                    case false: try? await ws.send("{ \"error\": \"Component '\(component)' not found\" }")
                 }
             }
             

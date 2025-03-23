@@ -7,7 +7,7 @@ extension Mist
     {
         case subscribe(component: String)
         // case unsubscribe(component: String)
-        case componentUpdate(component: String, action: String, id: UUID?, html: String)
+        case update(component: String, action: String, id: UUID?, html: String)
 
         private enum CodingKeys: String, CodingKey
         {
@@ -29,12 +29,8 @@ extension Mist
                     try container.encode("subscribe", forKey: .type)
                     try container.encode(component, forKey: .component)
                     
-                /*case .unsubscribe(let component):
-                    try container.encode("unsubscribe", forKey: .type)
-                    try container.encode(component, forKey: .component)*/
-                    
-                case .componentUpdate(let component, let action, let id, let html):
-                    try container.encode("componentUpdate", forKey: .type)
+                case .update(let component, let action, let id, let html):
+                    try container.encode("update", forKey: .type)
                     try container.encode(component, forKey: .component)
                     try container.encode(action, forKey: .action)
                     try container.encode(id, forKey: .id)
@@ -58,12 +54,12 @@ extension Mist
                     let component = try container.decode(String.self, forKey: .component)
                     self = .unsubscribe(component: component)*/
                     
-                case "componentUpdate":
+                case "update":
                     let component = try container.decode(String.self, forKey: .component)
                     let action = try container.decode(String.self, forKey: .action)
                     let id = try container.decodeIfPresent(UUID.self, forKey: .id)
                     let html = try container.decode(String.self, forKey: .html)
-                    self = .componentUpdate(component: component, action: action, id: id, html: html)
+                    self = .update(component: component, action: action, id: id, html: html)
                     
                 default:
                     throw DecodingError.dataCorrupted(

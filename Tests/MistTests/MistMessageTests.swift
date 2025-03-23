@@ -44,17 +44,17 @@ final class MistMessageTests: XCTestCase
         XCTAssertEqual(dict.count, 2, "JSON should only have 2 keys")
     }
     
-    // tests decoding json componentUpdate message to Mist.Message type
-    func testComponentUpdateDecoding() async
+    // tests decoding json update message to Mist.Message type
+    func testUpdateDecoding() async
     {
         // Create a UUID to test with
         let testUUID = UUID()
         
-        // Create JSON string for a componentUpdate message
+        // Create JSON string for a update message
         let text =
         """
         {
-            "type": "componentUpdate",
+            "type": "update",
             "component": "TestComponent",
             "action": "update",
             "id": "\(testUUID)",
@@ -62,12 +62,12 @@ final class MistMessageTests: XCTestCase
         }
         """
         
-        // Try to decode json message to mist componentUpdate message
+        // Try to decode json message to mist update message
         guard let data = text.data(using: .utf8) else { return XCTFail("Failed to convert JSON string to data") }
         guard let message = try? JSONDecoder().decode(Mist.Message.self, from: data) else { return XCTFail("Failed to decode data to Mist message") }
         
         // Verify the message is of correct type
-        guard case .componentUpdate(let component, let action, let id, let html) = message else { return XCTFail("Valid but non-componentUpdate message") }
+        guard case .update(let component, let action, let id, let html) = message else { return XCTFail("Valid but non-update message") }
         
         // Verify all fields match expected values
         XCTAssertEqual(component, "TestComponent", "Component name should match expected value")
@@ -76,14 +76,14 @@ final class MistMessageTests: XCTestCase
         XCTAssertEqual(html, "<div>Updated content</div>", "HTML content should match expected value")
     }
     
-    // tests encoding Mist.Message.componentUpdate to json
-    func testComponentUpdateEncoding() async
+    // tests encoding Mist.Message.update to json
+    func testUpdateEncoding() async
     {
         // Create a UUID to test with
         let testUUID = UUID()
         
-        // Create a componentUpdate message
-        let updateMessage = Mist.Message.componentUpdate(
+        // Create a update message
+        let updateMessage = Mist.Message.update(
             component: "TestComponent",
             action: "update",
             id: testUUID,
@@ -91,13 +91,13 @@ final class MistMessageTests: XCTestCase
         )
         
         // Encode the message to JSON
-        guard let jsonData = try? JSONEncoder().encode(updateMessage) else { return XCTFail("Failed to encode componentUpdate message") }
+        guard let jsonData = try? JSONEncoder().encode(updateMessage) else { return XCTFail("Failed to encode update message") }
         
         // Decode JSON data to a dictionary for inspection
         guard let dict = try? JSONSerialization.jsonObject(with: jsonData) as? [String: Any] else { return XCTFail("Failed to convert json to dictionary") }
         
         // Verify JSON structure and values
-        XCTAssertEqual(dict["type"] as? String, "componentUpdate", "Type should be 'componentUpdate'")
+        XCTAssertEqual(dict["type"] as? String, "update", "Type should be 'update'")
         XCTAssertEqual(dict["component"] as? String, "TestComponent", "Component should match")
         XCTAssertEqual(dict["action"] as? String, "update", "Action should match")
         XCTAssertEqual(dict["id"] as? String, testUUID.uuidString, "UUID should match")
