@@ -5,12 +5,15 @@ public struct Mist
 {
     public static func configure(using config: Mist.Configuration) async
     {
+        // registers components in config with MistComponents
         await Mist.registerComponents(using: config)
-        Mist.registerMistSocket(using: config)
+        
+        // registers subscription socket on server app
+        Mist.registerMistSocket(on: config.app)
     }
 }
 
-public extension Mist
+extension Mist
 {
     // initialize component system
     static func registerComponents(using config: Mist.Configuration) async

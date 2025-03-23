@@ -91,8 +91,8 @@ public extension Mist.Component
     }
 }
 
-// internal rendering
-extension Mist.Component
+// rendering
+public extension Mist.Component
 {
     // render component using dynamically generated template context
     static func render(id: UUID, on db: Database, using renderer: ViewRenderer) async -> String?

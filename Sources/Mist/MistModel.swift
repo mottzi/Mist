@@ -64,7 +64,7 @@ public extension Mist
     }
     
     // helper struct for string-based coding keys
-    struct StringCodingKey: CodingKey
+    private struct StringCodingKey: CodingKey
     {
         public var stringValue: String
         public var intValue: Int?
@@ -93,7 +93,7 @@ public extension Mist
     {
         let component: ModelContainer
         
-        public init(component: ModelContainer) { self.component = component }
+        init(component: ModelContainer) { self.component = component }
     }
     
     // collection context
@@ -101,6 +101,6 @@ public extension Mist
     {
         let components: [ModelContainer]
         
-        public init(components: [ModelContainer]) { self.components = components }
+        init(components: [ModelContainer]) { self.components = components }
     }
 }

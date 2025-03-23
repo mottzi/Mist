@@ -116,7 +116,7 @@ final class MistIntegrationTests: XCTestCase
         try await app.autoMigrate()
         
         // configure mist with our test component
-        let config = Mist.Configuration(for: app, using: [TestComponent.self], testing: true)
+        let config = Mist.Configuration(for: app, using: [TestComponent.self])
         await Mist.registerComponents(using: config)
         
         // subscription message
@@ -266,11 +266,11 @@ struct DumbComp4133: Mist.Component
     static let models: [any Mist.Model.Type] = [DummyModel1.self, DummyModel2.self]
 }
 
-public struct TestComponent: Mist.TestableComponent
+struct TestComponent: Mist.TestableComponent
 {    
-    public static let models: [any Mist.Model.Type] = [DummyModel1.self, DummyModel2.self]
+    static let models: [any Mist.Model.Type] = [DummyModel1.self, DummyModel2.self]
         
-    public static func templateStringLiteral(id: UUID) -> String
+    static func templateStringLiteral(id: UUID) -> String
     {
         """
         <div mist-component="TestComponent" mist-id="\(id)">
