@@ -16,7 +16,7 @@ public extension Mist
         let components: [any Mist.Component.Type]
         
         // initialize with application
-        public init(app: Application, components: [any Mist.Component.Type], db: DatabaseID? = nil, testing: Bool = false)
+        public init(for app: Application, using components: [any Mist.Component.Type], db: DatabaseID? = nil, testing: Bool = false)
         {
             self.app = app
             self.db = db

@@ -20,7 +20,7 @@ final class MistFlowTests: XCTestCase
         app.databases.use(.sqlite(.memory), as: .sqlite)
         
         // register multiple components with dublicate
-        let config = Mist.Configuration(app: app, components: [DumbComp4133.self])
+        let config = Mist.Configuration(for: app, using: [DumbComp4133.self])
         await Mist.registerComponents(using: config)
         
         // test this client message
@@ -119,7 +119,7 @@ final class MistFlowTests: XCTestCase
         try await app.autoMigrate()
         
         // configure mist with our test component
-        let config = Mist.Configuration(app: app, components: [DumbComp4133.self], testing: true)
+        let config = Mist.Configuration(for: app, using: [DumbComp4133.self], testing: true)
         await Mist.registerComponents(using: config)
         
         // subscription message
@@ -208,9 +208,11 @@ final class MistFlowTests: XCTestCase
                 guard let message = try? JSONDecoder().decode(Mist.Message.self, from: data) else { return await test.fail("Error decoding") }
   
                 // verify update message
-                guard case .componentUpdate(let component, _, let id, _) = message else { return await test.fail("Wrong Mist.Message received") }
+                guard case .componentUpdate(let component, _, let id, let html) = message else { return await test.fail("Wrong Mist.Message received") }
                 guard component == "DumbComp4133" else { return await test.fail("Wrong Component received") }
                 guard id == modelID else { return await test.fail("Wrong model ID received") }
+                
+                print("*** HTML: \(html)")
                 
                 // test finished
                 await test.pass()

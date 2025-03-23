@@ -30,7 +30,7 @@ final class MistComponentTests: XCTestCase
         try await app.autoMigrate()
         
         // configure mist with our test component
-        let config = Mist.Configuration(app: app, components: [MyComponent.self], testing: true)
+        let config = Mist.Configuration(for: app, using: [MyComponent.self], testing: true)
         await Mist.registerComponents(using: config)
         
         // Start the server
@@ -103,7 +103,7 @@ final class MistComponentTests: XCTestCase
         app.databases.use(.sqlite(.memory), as: .sqlite)
         app.migrations.add(DummyModel1.Table(), DummyModel2.Table())
         try await app.autoMigrate()
-        let config = Mist.Configuration(app: app, components: [MyComponent.self], testing: true)
+        let config = Mist.Configuration(for: app, using: [MyComponent.self], testing: true)
         await Mist.registerComponents(using: config)
         
         // Start the server
