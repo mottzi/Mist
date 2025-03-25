@@ -1,4 +1,5 @@
-// move this file to: /Public
+// Move this file (mist.js) to: /Public
+
 class MistSocket
 {
     constructor()
