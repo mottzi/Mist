@@ -11,7 +11,7 @@ Mist could be a lightweight Swift server-side rendering (SSR) extension for Vapo
 
 ## Setup
 
-### Add package dependency:
+### 1. Add package dependency:
 ```swift
 // Package.swift
 let package = Package(
@@ -32,7 +32,7 @@ let package = Package(
 ```
 Mist has Vapor, Fluent and Leaf declared as internal dependencies.
 
-### Define database table and model using Fluent:
+### 2. Define database table and model using Fluent:
 
 ```swift
 import Vapor
@@ -72,7 +72,8 @@ extension DummyModel1
 }
 ```
 Do the same with DummyModel2...
-### Define a server component:
+
+### 3. Define a server component:
 
 > [!WARNING]
 > The current implementation of Mist only supports a one-to-one component model relationship, implicitly using ```id: UUID```  as identifier (```model1.id == model1.id```).
@@ -87,13 +88,51 @@ struct DummyComponent: Mist.Component
 }
 ```
 
-### Template File (DummyComponent.leaf)
+### 4. Add component template (DummyComponent.leaf):
 
 ```html
-<div mist-component="TestComponent" 
-     mist-id="#(component.dummymodel1.id)">
-    <span>#(component.dummymodel1.id)</span>
-    <span>#(component.dummymodel1.text)</span>
-    <span>#(component.dummymodel2.text)</span>
-</div>
+<tr mist-component="DummyComponent"
+    mist-id="#(component.dummymodel1.id)">
+    <td>#(component.dummymodel1.id)</td>
+    <td>#(component.dummymodel1.text)</td>
+    <td>#(component.dummymodel2.text)</td>
+</tr>
+
+```
+
+### 5. Add template for an initial page request (InitialDummies.leaf):
+
+```html
+<!DOCTYPE html>
+<html>
+<body>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>DummyModel1</th>
+                <th>DummyModel2</th>
+            </tr>
+        </thead>
+        <tbody>
+        #for(component in components):
+            #extend("DummyComponent")
+        #endfor
+        </tbody>
+    </table>
+
+    <script src="/mist.js"></script>
+</body>
+</html>
+```
+
+### 6. Add route for initial page request (routes.swift):
+```swift
+app.get("dummies")
+{ request async throws -> View in
+    
+    // render initial page template with full data set or with empty context
+    let context = await DummyComponent.makeContext(ofAll: request.db) ?? Mist.MultipleComponentContext.empty
+    return try await request.view.render("InitialDummies", context)
+}
 ```
