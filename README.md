@@ -75,9 +75,9 @@ extension DummyModel1
 ```swift
 struct DummyComponent: Mist.Component
 {
-	static let models: [any Mist.Model.Type] = [
-		DummyModel1.self
-	]
+    static let models: [any Mist.Model.Type] = [
+        DummyModel1.self
+    ]
 }
 ```
 
@@ -86,7 +86,7 @@ struct DummyComponent: Mist.Component
 ```html
 <div mist-component="TestComponent" 
      mist-id="#(component.dummymodel1.id)">
-	<span>#(component.dummymodel1.id)</span>
-	<span>#(component.dummymodel1.text)</span>
+    <span>#(component.dummymodel1.id)</span>
+    <span>#(component.dummymodel1.text)</span>
 </div>
 ```
