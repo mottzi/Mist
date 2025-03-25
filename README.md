@@ -1,21 +1,22 @@
 
+
 # Mist
 
-A lightweight server-side rendering (SSR) framework for Vapor applications that enables real-time UI updates through WebSockets.
+Mist could be a lightweight Swift server-side rendering (SSR) extension for Vapor server applications that enables real-time UI component updates through WebSockets.
 
-This is in a very alpha state and not at all production ready, so feel free to make contributions to the source code!
+> [!WARNING]
+> This is in a very alpha state and not at all production ready. If you know Swift, please contribute in any form at all. This is just a bare bones prototype implementation.
+
+## Overview
 
 ## Setup
 
-### Package dependency
- 
- Add Mist as a package dependency in your Package.swift manifest file:
-
+### Add package dependency:
 ```swift
+// Package.swift
 let package = Package(
 	...
     dependencies: [
-        // Mist has Vapor, Fluent and Leaf as dependency
         .package(url: "https://github.com/mottzi/Mist", from: "0.5.0"),
     ],
     targets: [
@@ -25,12 +26,13 @@ let package = Package(
                 .product(name: "Mist", package: "Mist"),
                 ...
             ]
-        ),
+        )
     ]
 )
 ```
+Mist has Vapor, Fluent and Leaf declared as internal dependencies.
 
-### Database table and model
+### Define database table and model using Fluent:
 
 ```swift
 import Vapor
@@ -69,14 +71,18 @@ extension DummyModel1
     }
 }
 ```
+Do the same with DummyModel2...
+### Define a server component:
 
-### Server component
+> [!WARNING]
+> The current implementation of Mist only supports a one-to-one component model relationship, implicitly using ```id: UUID```  as identifier (```model1.id == model1.id```).
 
 ```swift
 struct DummyComponent: Mist.Component
 {
     static let models: [any Mist.Model.Type] = [
-        DummyModel1.self
+        DummyModel1.self,
+        DummyModel2.self
     ]
 }
 ```
@@ -88,5 +94,6 @@ struct DummyComponent: Mist.Component
      mist-id="#(component.dummymodel1.id)">
     <span>#(component.dummymodel1.id)</span>
     <span>#(component.dummymodel1.text)</span>
+    <span>#(component.dummymodel2.text)</span>
 </div>
 ```
