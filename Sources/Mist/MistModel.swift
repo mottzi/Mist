@@ -103,6 +103,6 @@ public extension Mist
         
         public init(components: [ModelContainer]) { self.components = components }
         
-        static var empty: MultipleComponentContext { .init(components: []) }
+        public static var empty: MultipleComponentContext { .init(components: []) }
     }
 }
