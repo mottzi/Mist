@@ -1,72 +1,69 @@
 import Vapor
 import Fluent
 
-extension Mist
+// thread-safe component registry
+actor Components
 {
-    // thread-safe component registry
-    actor Components
-    {
-        static let shared = Components()
-        private init() { }
-        
-        // type-erased mist component storage
-        private var components: [AnyComponent] = []
+    static let shared = Components()
+    private init() { }
+    
+    // type-erased mist component storage
+    private var components: [AnyComponent] = []
 
-        // type-safe mist component registration
-        func register<C: Mist.Component>(component: C.Type, using config: Mist.Configuration)
+    // type-safe mist component registration
+    func register<C: Mist.Component>(component: C.Type, using config: Mist.Configuration)
+    {
+        // abort if default naming was overwritten
+        // guard component.name == String(describing: C.self) else { assertionFailure("test"); return }
+        
+        // abort if component name is already registered
+        guard components.contains(where: { $0.name == C.name }) == false else { return }
+        
+        // register database listeners for component models
+        for model in component.models
         {
-            // abort if default naming was overwritten
-            // guard component.name == String(describing: C.self) else { assertionFailure("test"); return }
-            
-            // abort if component name is already registered
-            guard components.contains(where: { $0.name == C.name }) == false else { return }
-            
-            // register database listeners for component models
-            for model in component.models
+            // search for component using this model
+            let isModelUsed = components.contains()
             {
-                // search for component using this model
-                let isModelUsed = components.contains()
-                {
-                    $0.models.contains { ObjectIdentifier($0) == ObjectIdentifier(model) }
-                }
-                
-                // if this model is not yet used
-                if isModelUsed == false
-                {
-                    // register db model listener middleware
-                    model.createListener(using: config, on: config.db)
-                }
+                $0.models.contains { ObjectIdentifier($0) == ObjectIdentifier(model) }
             }
             
-            // add new type erased mist component to storage
-            if let testableComponent = component as? any TestableComponent.Type
+            // if this model is not yet used
+            if isModelUsed == false
             {
-                // for test components
-                components.append(AnyComponent(testableComponent))
+                // register db model listener middleware
+                model.createListener(using: config, on: config.db)
             }
-            else
-            {
-                // for regular components
-                components.append(AnyComponent(component))
-            }            
         }
         
-        // retrieve all components that use a specific model
-        func getComponents<M: Model>(for type: M.Type) -> [AnyComponent]
+        // add new type erased mist component to storage
+        if let testableComponent = component as? any TestableComponent.Type
         {
-            return components.filter { $0.models.contains { ObjectIdentifier($0) == ObjectIdentifier(type) } }
+            // for test components
+            components.append(AnyComponent(testableComponent))
         }
-        
-        // checks if component with given name exists
-        func hasComponent(name: String) -> Bool
+        else
         {
-            return components.contains { $0.name == name }
+            // for regular components
+            components.append(AnyComponent(component))
         }
+    }
+    
+    // retrieve all components that use a specific model
+    func getComponents<M: Model>(for type: M.Type) -> [AnyComponent]
+    {
+        return components.filter { $0.models.contains { ObjectIdentifier($0) == ObjectIdentifier(type) } }
+    }
+    
+    // checks if component with given name exists
+    func hasComponent(name: String) -> Bool
+    {
+        return components.contains { $0.name == name }
     }
 }
 
 #if DEBUG
-extension Mist.Components
+extension Components
 {
     func registerWOListenerForTesting<C: Mist.Component>(_ component: C.Type)
     {

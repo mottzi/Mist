@@ -1,28 +1,25 @@
 import Vapor
 import Fluent
 
-extension Mist
+actor Clients
 {
-    actor Clients
+    static let shared = Clients()
+    
+    private var clients: [Client] = []
+    
+    func getClients() -> [Client]
     {
-        static let shared = Clients()
-        
-        private var clients: [Client] = []
-        
-        func getClients() -> [Client]
-        {
-            return clients
-        }
-        
-        func getSubscribers(of component: String) -> [Client]
-        {
-            return clients.filter { $0.subscriptions.contains(component) }
-        }
+        return clients
+    }
+    
+    func getSubscribers(of component: String) -> [Client]
+    {
+        return clients.filter { $0.subscriptions.contains(component) }
     }
 }
 
 // clients
-extension Mist.Clients
+extension Clients
 {
     struct Client
     {
@@ -45,14 +42,14 @@ extension Mist.Clients
 }
     
 // subscriptions
-extension Mist.Clients
+extension Clients
 {
     // add subscription to connection
     @discardableResult
     func addSubscription(_ component: String, to client: UUID) async -> Bool
     {
         // abort if component doesn't exist in registry
-        guard await Mist.Components.shared.hasComponent(name: component) else { return false }
+        guard await Components.shared.hasComponent(name: component) else { return false }
         
         // abort if client doesn't exist in registry
         guard let index = clients.firstIndex(where: { $0.id == client }) else { return false }
@@ -66,7 +63,7 @@ extension Mist.Clients
 }
 
 // broadcasting
-extension Mist.Clients
+extension Clients
 {
     // send model update message to all subscribed clients
     func broadcast(_ message: Mist.Message) async
@@ -85,7 +82,7 @@ extension Mist.Clients
 }
 
 #if DEBUG
-extension Mist.Clients
+extension Clients
 {
     func resetForTesting() async
     {

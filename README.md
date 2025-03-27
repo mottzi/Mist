@@ -7,7 +7,7 @@ Mist could be a lightweight Swift server-side rendering (SSR) extension for Vapo
 
 ## Overview
 
-This prototype is made up of 8 server side Swift files and 1 client side JavaScript file:
+This prototype is made up of 8 .swift and 1 .js file:
 | File | Main Function |
 |----------|----------|
 | **mist**.js | client-side DOM updates |
@@ -23,9 +23,8 @@ This prototype is made up of 8 server side Swift files and 1 client side JavaScr
 
 ## Setup
 
-### 1. Add package dependency:
+### 1. Add package dependency (Package.swift):
 ```swift
-// Package.swift
 let package = Package(
 	...
     dependencies: [
@@ -44,7 +43,7 @@ let package = Package(
 ```
 Mist has Vapor, Fluent and Leaf declared as internal dependencies.
 
-### 2. Define database table and model using Fluent:
+### 2. Define database table and model:
 
 ```swift
 import Vapor
@@ -100,7 +99,9 @@ struct DummyComponent: Mist.Component
 }
 ```
 
-### 4. Add component template (DummyComponent.leaf):
+### 4. Add component template: 
+
+File *Resources/Views/DummyComponent.leaf*:
 
 ```html
 <tr mist-component="DummyComponent"
@@ -112,7 +113,9 @@ struct DummyComponent: Mist.Component
 
 ```
 
-### 5. Add template for an initial page request (InitialDummies.leaf):
+### 5. Add template for an initial page request:
+
+File *Resources/Views/InitialDummies.leaf*:
 
 ```html
 <!DOCTYPE html>
@@ -138,12 +141,31 @@ struct DummyComponent: Mist.Component
 </html>
 ```
 
-### 6. Add route for initial page request (routes.swift):
+### 6. Add route for initial page request:
+
+File *Sources/App/routes.swift*:
+
 ```swift
+...
 app.get("dummies")
 { request async throws -> View in
     // render initial page template with full data set
     let context = await DummyComponent.makeContext(ofAll: request.db)
     return try await request.view.render("InitialDummies", context)
 }
+...
+```
+
+### 7. Configure Mist
+
+File *Sources/App/configure.swift*:
+
+```swift
+...
+let config = Mist.Configuration(for: app, using: [
+    DummyRow.self, DummyRowCustom.self
+])
+
+await Mist.configure(using: config)
+...
 ```

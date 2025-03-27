@@ -2,25 +2,22 @@ import Vapor
 import Fluent
 @testable import LeafKit
 
-// public component protocol
-public extension Mist
+// mist component protocol
+public protocol Component
 {
-    // mist component protocol
-    protocol Component
-    {
-        // component name
-        static var name: String { get }
-        
-        // component template
-        static var template: String { get }
-        
-        // component models (joined by common id)
-        static var models: [any Mist.Model.Type] { get }
-    }
+    // component name
+    static var name: String { get }
+    
+    // component template
+    static var template: String { get }
+    
+    // component models (joined by common id)
+    static var models: [any Mist.Model.Type] { get }
 }
 
+
 // default naming
-public extension Mist.Component
+public extension Component
 {
     // name matches component type name
     static var name: String { String(describing: self) }
@@ -30,7 +27,7 @@ public extension Mist.Component
 }
 
 // default context
-public extension Mist.Component
+public extension Component
 {
     // create single component context
     static func makeContext(of componentID: UUID, in db: Database) async -> Mist.SingleComponentContext?
@@ -92,7 +89,7 @@ public extension Mist.Component
 }
 
 // rendering
-public extension Mist.Component
+public extension Component
 {
     // render component using dynamically generated template context
     static func render(id: UUID, on db: Database, using renderer: ViewRenderer) async -> String?
@@ -117,69 +114,64 @@ public extension Mist.Component
     }
 }
 
-extension Mist
+// type-erased component wrapper for storage of heterogeneous components inside a single collection
+struct AnyComponent: Sendable
 {
-    // type-erased component wrapper for storage of heterogeneous components inside a single collection
-    struct AnyComponent: Sendable
+    // component metadata
+    let name: String
+    let template: String
+    let models: [any Model.Type]
+    
+    // type-erased functions
+    private let _shouldUpdate: @Sendable (any Mist.Model) -> Bool
+    private let _render: @Sendable (UUID, Database, ViewRenderer) async -> String?
+    
+    // create type-erased component from any concrete component type
+    init<C: Component>(_ component: C.Type)
     {
-        // component metadata
-        let name: String
-        let template: String
-        let models: [any Model.Type]
+        self.name = C.name
+        self.template = C.template
+        self.models = C.models
         
-        // type-erased functions
-        private let _shouldUpdate: @Sendable (any Mist.Model) -> Bool
-        private let _render: @Sendable (UUID, Database, ViewRenderer) async -> String?
-        
-        // create type-erased component from any concrete component type
-        init<C: Component>(_ component: C.Type)
-        {
-            self.name = C.name
-            self.template = C.template
-            self.models = C.models
-            
-            // capture concrete type function
-            self._shouldUpdate =
-            { model in
-                return C.shouldUpdate(for: model)
-            }
-            
-            // capture concrete type function
-            self._render =
-            { id, db, renderer in
-                print("*** Server rendering '\(C.name)' (file template)... ")
-                return await C.render(id: id, on: db, using: renderer)
-            }
+        // capture concrete type function
+        self._shouldUpdate =
+        { model in
+            return C.shouldUpdate(for: model)
         }
         
-        // forward call to the captured function
-        func shouldUpdate(for model: any Mist.Model) -> Bool
-        {
-            _shouldUpdate(model)
-        }
-        
-        // forward call to the captured function
-        func render(id: UUID, on db: Database, using renderer: ViewRenderer) async -> String?
-        {
-            await _render(id, db, renderer)
+        // capture concrete type function
+        self._render =
+        { id, db, renderer in
+            print("*** Server rendering '\(C.name)' (file template)... ")
+            return await C.render(id: id, on: db, using: renderer)
         }
     }
+    
+    // forward call to the captured function
+    func shouldUpdate(for model: any Mist.Model) -> Bool
+    {
+        _shouldUpdate(model)
+    }
+    
+    // forward call to the captured function
+    func render(id: UUID, on db: Database, using renderer: ViewRenderer) async -> String?
+    {
+        await _render(id, db, renderer)
+    }
 }
+
 
 // for unit tests
 #if DEBUG
-extension Mist
+protocol TestableComponent: Mist.Component
 {
-    protocol TestableComponent: Mist.Component
-    {
-        static func templateStringLiteral(id: UUID) -> String
-    }
+    static func templateStringLiteral(id: UUID) -> String
 }
 
-extension Mist.AnyComponent
+extension AnyComponent
 {
     // create type-erased component from any concrete component type
-    init<C: Mist.TestableComponent>(_ component: C.Type)
+    init<C: TestableComponent>(_ component: C.Type)
     {
         self.name = C.name
         self.template = C.template
