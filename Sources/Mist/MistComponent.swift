@@ -28,7 +28,7 @@ public extension Mist.Component
     // template matches component type name
     static var template: String { String(describing: self) }
 }
-    
+
 // default context
 public extension Mist.Component
 {
@@ -59,35 +59,35 @@ public extension Mist.Component
     }
     
     // create collection context for multiple components
-    static func makeContext(ofAll db: Database) async -> Mist.MultipleComponentContext?
+    static func makeContext(ofAll db: Database) async -> Mist.MultipleComponentContext
     {
         // array of data containes for dynamic multi model context creation
-        var componentDataCollection: [Mist.ModelContainer] = []
+        var modelContainers: [Mist.ModelContainer] = []
         
         // abort if not one model type was provided
-        guard let primaryModelType = models.first else { return nil }
+        guard let primaryModelType = models.first else { return Mist.MultipleComponentContext.empty }
         
         // get data for all entries of the primary model
-        guard let primaryModelEntries = await primaryModelType.findAll(db) else { return nil }
+        guard let primaryModelEntries = await primaryModelType.findAll(db) else { return Mist.MultipleComponentContext.empty }
         
         // fetch data of related secondary models
         for primaryModelEntry in primaryModelEntries
         {
             // validate model UUID
-            guard let componentID = primaryModelEntry.id else { continue }
+            guard let modelID = primaryModelEntry.id else { continue }
             
             // fetch all related secondary model entries with matching id
-            guard let componentContext = await makeContext(of: componentID, in: db) else { continue }
+            guard let modelContext = await makeContext(of: modelID, in: db) else { continue }
             
             // data of all models of component to data collection
-            componentDataCollection.append(componentContext.component)
+            modelContainers.append(modelContext.component)
         }
         
         // abort if not one component loaded its model data in full
-        guard componentDataCollection.isEmpty == false else { return nil }
+        guard modelContainers.isEmpty == false else { return Mist.MultipleComponentContext.empty }
         
         // return context of all components and their collected model data
-        return Mist.MultipleComponentContext(components: componentDataCollection)
+        return Mist.MultipleComponentContext(components: modelContainers)
     }
 }
 
@@ -119,7 +119,7 @@ public extension Mist.Component
 
 extension Mist
 {
-    // type-erased component for storage in collections
+    // type-erased component wrapper for storage of heterogeneous components inside a single collection
     struct AnyComponent: Sendable
     {
         // component metadata
@@ -166,6 +166,7 @@ extension Mist
     }
 }
 
+// for unit tests
 #if DEBUG
 extension Mist
 {
@@ -206,6 +207,7 @@ extension Mist.AnyComponent
     }
 }
 
+// enables leaf rendering with in-memory template string literal
 private func renderLeafForTesting<E: Encodable>(_ templateString: String, with context: E) throws -> String
 {
     // 1. Convert Encodable context to LeafData
