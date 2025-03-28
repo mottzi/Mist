@@ -25,12 +25,12 @@ func registerMistSocket(on app: Application)
             guard let message = try? JSONDecoder().decode(Message.self, from: data) else { return }
             guard case .subscribe(let component) = message else { return }
                     
-            // and component subscription to client
+            // add component subscription to client
             switch await Clients.shared.addSubscription(component, to: clientID)
             {
                 // send confirmation message
                 case true: try? await ws.send("{ \"msg\": \"Subscribed to '\(component)'\" }")
-                case false: try? await ws.send("{ \"error\": \"Component '\(component)' not found\" }")
+                case false: try? await ws.send("{ \"error\": \"Component '\(component)' not added\" }")
             }
         }
         

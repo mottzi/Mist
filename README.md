@@ -191,3 +191,16 @@ To help the community understand the current implementation of Mist, here are so
 5. Server sends initial HTML (including mist.js) to client
 
 </details>
+
+<details>
+<summary>2. Component Subscription</summary>
+	
+![Initial](https://mottzi.de/space/mist1.svg)
+
+1. Client uses mist.js to connect to server through web socket
+2. Server adds the connected client to registry
+3. Client scans DOM for "mist-component" HTML attribute
+4. Client sends subscription messages of found components
+5. Server adds subscriptions to client inside of registry
+
+</details>
