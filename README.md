@@ -174,3 +174,19 @@ let config = Mist.Configuration(for: app, using: [
 await Mist.configure(using: config)
 ...
 ```
+
+## Data Flow Charts
+
+To help the community understand the current implementation of Mist, here are some flow charts that help visualize the flow of data through Mist:
+
+<details>
+<summary>1. Initial Page Request</summary>
+
+1. Client sends HTTP GET request for full page to server
+2. Server fetches necessary data from database
+3. Server creates a template data context
+4. Server renders full page template using component template
+5. Server sends full page HTML including mist.js to client
+	
+![Initial](https://mottzi.de/space/mist1.svg)
+</details>
