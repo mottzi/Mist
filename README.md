@@ -182,7 +182,7 @@ To help the community understand the current implementation of Mist, here are so
 <details>
 <summary>1. Initial Page Request</summary>
 	
-![Initial](https://mottzi.de/space/mist1.svg)
+![Initial](https://mottzi.de/space/mist0.svg)
 
 1. Client requests initial full page
 2. Server fetches necessary data from database
