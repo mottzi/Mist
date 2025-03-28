@@ -1,25 +1,28 @@
 # Mist
 
-Mist could be a lightweight Swift server-side rendering (SSR) extension for Vapor server applications that enables real-time UI component updates through WebSockets.
+Mist is a lightweight Swift server components extension for Vapor applications. It enables real-time UI component updates through type safe web socket communication.
 
 > [!WARNING]
-> This is in a very alpha state and not at all production ready. If you know Swift, please contribute in any form at all. This is just a bare bones prototype implementation.
+> Alpha: This is just a proof of concept implementation and not at all production ready!
+
+If you know any Swift at all, please contribute to this project however you can! Together we can make this Swift's [LiveView](https://hexdocs.pm/phoenix_live_view/welcome.html) / [Livewire](https://livewire.laravel.com)!
 
 ## Overview
 
 This prototype is made up of 8 .swift and 1 .js file:
-| File | Main Function |
-|----------|----------|
-| **mist**.js | client-side DOM updates |
-| &nbsp; |  |
-| **Mist**.swift | main entry point, configuration, initialization |
-| **MistComponent**.swift | template context generation, html rendering |
-| **MistModel**.swift | template context generation |
-| **MistListener**.swift | database update detection, messaging |
-| **MistClients**.swift | client registry, messaging  |
-| **MistComponents**.swift | component registry |
-| **MistSocket**.swift | web socket server, handles client component subscriptions |
-| **MistMessage**.swift | type safe client-server-client communication over web sockets |
+
+```swift
+// mist.js:                 client-side DOM updates
+
+// Mist.swift:              main entry point, configuration, initialization
+// MistComponent.swift:     template context generation, html rendering
+// MistModel.swift:         template context generation
+// MistListener.swift:      database update detection, messaging
+// MistClients.swift:       client registry, messaging
+// MistComponents.swift:    component registry
+// MistSocket.swift:        web socket server, handles client component subscriptions
+// MistMessage.swift:       type safe client-server-client communication over web sockets
+```
 
 ## Setup
 
@@ -87,9 +90,11 @@ Do the same with DummyModel2...
 ### 3. Define a server component:
 
 > [!WARNING]
-> The current implementation of Mist only supports a one-to-one component model relationship in multi model components. Mist will implicitly use a model's ```id: UUID``` property  as identifier (```model1.id == model2.id```).
+> The current implementation only supports one-to-one component model relationships in multi model components. Mist will implicitly use a model's ```id: UUID``` property  as identifier (```model1.id == model2.id```).
 
 ```swift
+import Mist
+
 struct DummyComponent: Mist.Component
 {
     static let models: [any Mist.Model.Type] = [
