@@ -3,7 +3,7 @@
 Mist is a lightweight Swift server components extension for Vapor applications. It enables real-time UI component updates through type safe web socket communication.
 
 > [!WARNING]
-> Alpha: This is just a proof of concept implementation and not at all production ready!
+> This is just a proof of concept implementation and not at all production ready!
 
 If you know any Swift at all, please contribute to this project however you can! Together we can make this Swift's [LiveView](https://hexdocs.pm/phoenix_live_view/welcome.html) / [Livewire](https://livewire.laravel.com)!
 
