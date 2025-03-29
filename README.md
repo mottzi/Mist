@@ -7,23 +7,6 @@ Mist is a lightweight Swift server components extension for Vapor applications. 
 
 If you know any Swift at all, please contribute to this project however you can! Together we can make this Swift's [LiveView](https://hexdocs.pm/phoenix_live_view/welcome.html) / [Livewire](https://livewire.laravel.com)!
 
-## Overview
-
-This prototype is made up of 8 .swift and 1 .js file:
-
-```swift
-// mist.js:                 client-side DOM updates
-
-// Mist.swift:              main entry point, configuration, initialization
-// MistComponent.swift:     template context generation, html rendering
-// MistModel.swift:         template context generation
-// MistListener.swift:      database update detection, messaging
-// MistClients.swift:       client registry, messaging
-// MistComponents.swift:    component registry
-// MistSocket.swift:        web socket server, handles client component subscriptions
-// MistMessage.swift:       type safe client-server-client communication over web sockets
-```
-
 ## Setup
 
 ### 1. Add package dependency (Package.swift):
@@ -175,7 +158,24 @@ await Mist.configure(using: config)
 ...
 ```
 
-## Data Flow Charts
+## Overview
+
+This prototype is made up of 8 .swift and 1 .js file:
+
+```swift
+// mist.js:                 client-side DOM updates
+
+// Mist.swift:              main entry point, configuration, initialization
+// MistComponent.swift:     template context generation, html rendering
+// MistModel.swift:         template context generation
+// MistListener.swift:      database update detection, messaging
+// MistClients.swift:       client registry, messaging
+// MistComponents.swift:    component registry
+// MistSocket.swift:        web socket server, handles client component subscriptions
+// MistMessage.swift:       type safe client-server-client communication over web sockets
+```
+
+### Data Flow Charts
 
 To help the community understand the current implementation of Mist, here are some flow charts that help visualize the flow of data through Mist:
 
