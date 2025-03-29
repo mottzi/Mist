@@ -204,3 +204,18 @@ To help the community understand the current implementation of Mist, here are so
 5. Server adds subscriptions to client inside of registry
 
 </details>
+
+<details>
+<summary>3. Component Update Broadcasting</summary>
+	
+![Initial](https://mottzi.de/space/mist-listener.svg?)
+
+1. Server registers middleware listeners for each model
+2. Database model entry changes
+3. Mist.Listener for that model triggers
+4. Server identifies components using changed model
+5. Server re-renders affected components and creates update messages
+6. Server identifies clients that are subscribed to these components
+7. Server broadcasts update messages to subscribed clients
+
+</details>
