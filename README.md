@@ -195,7 +195,7 @@ To help the community understand the current implementation of Mist, here are so
 <details>
 <summary>2. Component Subscription</summary>
 	
-![Initial](https://mottzi.de/space/mist-subscription.svg?)
+![Initial](https://mottzi.de/space/mist-sub1.svg?)
 
 1. Client uses mist.js to connect to server through web socket
 2. Server adds the connected client to registry
