@@ -5,7 +5,7 @@ Mist is a lightweight Swift server components extension for Vapor applications. 
 > [!WARNING]
 > This is just a proof of concept implementation and not at all production ready!
 
-If you know any Swift at all, please contribute to this project however you can! Together we can make this Swift's [LiveView](https://hexdocs.pm/phoenix_live_view/welcome.html) / [Livewire](https://livewire.laravel.com)!
+AFAIK, the Swift/Vapor ecosystem does not currently have an equivalent to Phoenix [LiveView](https://hexdocs.pm/phoenix_live_view/welcome.html) or Laravel [Livewire](https://livewire.laravel.com)... If you know any Swift at all, please contribute to this project however you can! 
 
 ## Setup
 
@@ -70,7 +70,7 @@ extension DummyModel1
 ```
 Do the same with DummyModel2...
 
-### 3. Define a server component:
+### 3. Define server component:
 
 > [!WARNING]
 > The current implementation only supports one-to-one component model relationships in multi model components. Mist will implicitly use a model's ```id: UUID``` property  as identifier (```model1.id == model2.id```).
@@ -101,7 +101,7 @@ File *Resources/Views/DummyComponent.leaf*:
 
 ```
 
-### 5. Add template for an initial page request:
+### 5. Add template for initial page request:
 
 File *Resources/Views/InitialDummies.leaf*:
 
@@ -162,24 +162,28 @@ await Mist.configure(using: config)
 
 ### Overview
 
-This prototype is made up of 8 .swift and 1 .js file:
+This prototype contains eight .swift and one .js file:
 
 ```swift
-// mist.js:                 client-side DOM updates
+// Mist.swift:              entry point, configuration, initialization
+// MistClients.swift:       central client registry, messaging
+// MistComponents.swift:    central component registry
 
-// Mist.swift:              main entry point, configuration, initialization
-// MistComponent.swift:     template context generation, html rendering
-// MistModel.swift:         template context generation
+// MistComponent.swift:     context generation, html rendering
+// MistModel.swift:         context generation
 // MistListener.swift:      database update detection, messaging
-// MistClients.swift:       client registry, messaging
-// MistComponents.swift:    component registry
+
 // MistSocket.swift:        web socket server, handles client component subscriptions
 // MistMessage.swift:       type safe client-server-client communication over web sockets
 ```
 
+```swift
+// mist.js:                 client-side DOM updates
+```
+
 ### Data Flow Charts
 
-To help the community understand the current implementation of Mist, here are some flow charts that help visualize the flow of data through Mist:
+I created some flow charts that visualize the data flow in important parts of Mist:
 
 <details>
 <summary>1. Initial Page Request</summary>
