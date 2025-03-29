@@ -186,7 +186,7 @@ This prototype contains eight .swift and one .js file:
 I created some flow charts that visualize the data flow in important parts of Mist:
 
 <details>
-<summary>1. Initial Page Request</summary>
+<summary>1. **Initial Page Request**</summary>
 	
 ![Initial](https://mottzi.de/space/mist0.svg?)
 
@@ -199,7 +199,7 @@ I created some flow charts that visualize the data flow in important parts of Mi
 </details>
 
 <details>
-<summary>2. Component Subscription</summary>
+<summary>2. **Component Subscription**</summary>
 	
 ![Initial](https://mottzi.de/space/mist-sub1.svg?)
 
@@ -212,7 +212,7 @@ I created some flow charts that visualize the data flow in important parts of Mi
 </details>
 
 <details>
-<summary>3. Component Update Broadcasting</summary>
+<summary>3. **Component Update Broadcasting**</summary>
 	
 ![Initial](https://mottzi.de/space/mist-listener.svg?)
 
@@ -227,7 +227,7 @@ I created some flow charts that visualize the data flow in important parts of Mi
 </details>
 
 <details>
-<summary>4. Client Update Handling</summary>
+<summary>4. **Client Update Handling**</summary>
 	
 ![Initial](https://mottzi.de/space/mist-update.svg?)
 
