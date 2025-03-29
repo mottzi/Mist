@@ -158,7 +158,9 @@ await Mist.configure(using: config)
 ...
 ```
 
-## Overview
+## Documentation
+
+### Overview
 
 This prototype is made up of 8 .swift and 1 .js file:
 
