@@ -225,3 +225,15 @@ I created some flow charts that visualize the data flow in important parts of Mi
 7. Server broadcasts update messages to subscribed clients
 
 </details>
+
+<details>
+<summary>4. Client Update Handling</summary>
+	
+![Initial](https://mottzi.de/space/mist-update.svg?)
+
+1. Client receives update message using mist.js
+2. Client parses received JSON payload
+3. Client scans DOM to find elements with matching component name and id
+4. Client replaces outerHTML of found component with update
+
+</details>
