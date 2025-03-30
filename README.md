@@ -1,6 +1,6 @@
 # Mist
 
-Mist is a lightweight Swift server components extension for Vapor applications. It enables real-time UI component updates through type safe web socket communication.
+Mist is a lightweight Swift server components extension for [Vapor](https://docs.vapor.codes) applications. It enables real-time UI component updates through type safe web socket communication. [Fluent](https://docs.vapor.codes/fluent/overview/) is used as database ORM and [Leaf](https://docs.vapor.codes/leaf/overview/) is used as HTML templating engine - both are part of Vapor's default stack.
 
 > [!WARNING]
 > This is just a proof of concept implementation and not at all production ready!
@@ -38,11 +38,16 @@ import Mist
 
 final class DummyModel1: Mist.Model, Content
 {
-    static let schema = "dummymodels"
+    static let schema = "dummymodel1"
     
-    @ID(key: .id) var id: UUID?
-    @Field(key: "text") var text: String
-    @Timestamp(key: "created", on: .create) var created: Date?
+    @ID(key: .id) 
+    var id: UUID?
+    
+    @Field(key: "text") 
+    var text: String
+    
+    @Timestamp(key: "created", on: .create) 
+    var created: Date?
     
     init() {}
     init(text: String) { self.text = text }
@@ -92,8 +97,7 @@ struct DummyComponent: Mist.Component
 File *Resources/Views/DummyComponent.leaf*:
 
 ```html
-<tr mist-component="DummyComponent"
-    mist-id="#(component.dummymodel1.id)">
+<tr mist-component="DummyComponent" mist-id="#(component.dummymodel1.id)">
     <td>#(component.dummymodel1.id)</td>
     <td>#(component.dummymodel1.text)</td>
     <td>#(component.dummymodel2.text)</td>
@@ -134,14 +138,13 @@ File *Resources/Views/InitialDummies.leaf*:
 File *Sources/App/routes.swift*:
 
 ```swift
-...
 app.get("dummies")
 { request async throws -> View in
-    // render initial page template with full data set
+    // create template context with all available component data
     let context = await DummyComponent.makeContext(ofAll: request.db)
+    // render initial page template with full data set
     return try await request.view.render("InitialDummies", context)
 }
-...
 ```
 
 ### 7. Configure Mist
@@ -149,13 +152,23 @@ app.get("dummies")
 File *Sources/App/configure.swift*:
 
 ```swift
-...
-let config = Mist.Configuration(for: app, using: [
-    DummyRow.self, DummyRowCustom.self
-])
+// needed to serve mist.js to client
+app.middleware.use(FileMiddleware(publicDirectory: app.directory.publicDirectory))
+
+// create component model database tables
+app.migrations.add(
+    DummyModel1.Table(),
+    DummyModel2.Table()
+)
+    
+let config = Mist.Configuration(
+    for: app,
+    components: [
+        DummyComponents.self,
+    ]
+)
 
 await Mist.configure(using: config)
-...
 ```
 
 ## Documentation

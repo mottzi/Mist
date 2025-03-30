@@ -23,7 +23,7 @@ public struct Configuration: Sendable
     
     // public initializer
     public init(for app: Application,
-                using components: [any Mist.Component.Type],
+                components: [any Mist.Component.Type],
                 on db: DatabaseID? = nil)
     {
         self.app = app
