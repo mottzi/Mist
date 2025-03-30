@@ -140,7 +140,7 @@ File *Resources/Views/InitialDummies.leaf*:
 File *Sources/App/routes.swift*:
 
 ```swift
-app.get("dummies")
+app.get("DummyComponents")
 { request async throws -> View in
     // create template context with all available component data
     let context = await DummyComponent.makeContext(ofAll: request.db)
