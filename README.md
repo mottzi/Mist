@@ -114,6 +114,11 @@ File *Resources/Views/InitialDummies.leaf*:
 ```html
 <!DOCTYPE html>
 <html>
+<head>
+    <style>
+        th, td { padding: 0 15px; }
+    </style>
+</head>
 <body>
     <table>
         <thead>
@@ -149,6 +154,31 @@ app.get("DummyComponents")
 }
 ```
 
+For demo purposes, add an endpoint to update component model data in database:
+
+```swift
+app.get("DummyModel1", "update", ":id", ":text")
+{ req async throws -> HTTPStatus in
+    
+    guard let idString = req.parameters.get("id"),
+          let id = UUID(uuidString: idString)
+    else { throw Abort(.badRequest, reason: "Valid UUID required") }
+    
+    guard let text = req.parameters.get("text")
+    else { throw Abort(.badRequest, reason: "Valid text required") }
+    
+    guard let dummyModel1 = try await DummyModel1.find(id, on: req.db)
+    else { throw Abort(.notFound, reason: "DummyModel1 not found") }
+    
+    dummyModel1.text = text
+    try await dummyModel1.save(on: req.db)
+    
+    return .ok
+}
+```
+
+Do the same for DummyModel2...
+
 ### 7. Configure Mist
 
 File *Sources/App/configure.swift*:
@@ -162,7 +192,8 @@ app.migrations.add(
     DummyModel1.Table(),
     DummyModel2.Table()
 )
-    
+ 
+// define Mist configuration
 let config = Mist.Configuration(
     for: app,
     components: [
@@ -170,7 +201,22 @@ let config = Mist.Configuration(
     ]
 )
 
+// initialize Mist with configuration
 await Mist.configure(using: config)
+```
+
+For demo purposes, create component models right after Mist configuration:
+
+```swift
+let dummyModel1 = DummyModel1(text: "Hello")
+let dummyModel2 = DummyModel2(text: "World")
+
+let componentID = UUID()
+dummyModel1.id = componentID
+dummyModel2.id = componentID
+
+try await dummyModel1.save(on: app.db)
+try await dummyModel2.save(on: app.db)
 ```
 
 ## Documentation
