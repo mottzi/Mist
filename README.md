@@ -123,7 +123,7 @@ File *Resources/Views/InitialDummies.leaf*:
     <table>
         <thead>
             <tr>
-                <th>ID</th>
+                <th>Component ID</th>
                 <th>DummyModel1</th>
                 <th>DummyModel2</th>
             </tr>
