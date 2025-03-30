@@ -9,6 +9,14 @@ Mist is a lightweight Swift server components extension for [Vapor](https://docs
 
 AFAIK, the Swift/Vapor ecosystem does not currently have an equivalent to Phoenix [LiveView](https://hexdocs.pm/phoenix_live_view/welcome.html) or Laravel [Livewire](https://livewire.laravel.com)... If you know any Swift at all, please contribute to this project however you can! 
 
+## Demo
+
+The video below demonstrates Mist's real-time update capability: When database entries are modified, the changes are automatically detected and broadcasted to all connected clients. In this demo, we trigger database updates using simple HTTP GET requests to specific endpoints. When these endpoints are called, the server updates the corresponding database records, which Mist automatically detects. The system then renders the updated component HTML and pushes it through WebSockets to all subscribed clients, where the DOM is instantly updated without requiring a page refresh.
+
+Keep an eye on the incoming update-messages in the browser's console!
+
+https://github.com/user-attachments/assets/6f9450a8-1abd-4b3c-a91b-f960ef53f606
+
 ## Setup
 
 ### 1. Add package dependency (Package.swift):
@@ -149,6 +157,7 @@ app.get("DummyComponents")
 { request async throws -> View in
     // create template context with all available component data
     let context = await DummyComponent.makeContext(ofAll: request.db)
+
     // render initial page template with full data set
     return try await request.view.render("InitialDummies", context)
 }
@@ -205,7 +214,7 @@ let config = Mist.Configuration(
 await Mist.configure(using: config)
 ```
 
-For demo purposes, create component models right after Mist configuration:
+For demo purposes, create component models after configuration:
 
 ```swift
 let dummyModel1 = DummyModel1(text: "Hello")
