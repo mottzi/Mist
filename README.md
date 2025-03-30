@@ -188,7 +188,7 @@ app.get("DummyModel1", "update", ":id", ":text")
 
 Do the same for DummyModel2...
 
-### 7. Configure Mist
+### 7. Configure Mist:
 
 File *Sources/App/configure.swift*:
 
@@ -227,6 +227,12 @@ dummyModel2.id = componentID
 try await dummyModel1.save(on: app.db)
 try await dummyModel2.save(on: app.db)
 ```
+
+### 8. Copy mist.js to your public directory
+
+The Mist framework package contains a mist.js file that handles client side DOM manipulation.
+
+Simply copy this file to your application's /Public directory.
 
 ## Documentation
 
