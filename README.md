@@ -11,7 +11,11 @@ AFAIK, the Swift/Vapor ecosystem does not currently have an equivalent to Phoeni
 
 ## Demo
 
-The video below demonstrates Mist's real-time update capability: When database entries are modified, the changes are automatically detected and broadcasted to all connected clients. In this demo, we trigger database updates using simple HTTP GET requests to specific endpoints. When these endpoints are called, the server updates the corresponding database records, which Mist automatically detects. The system then renders the updated component HTML and pushes it through WebSockets to all subscribed clients, where the DOM is instantly updated without requiring a page refresh.
+The video below demonstrates Mist's real-time update capability: When database entries are modified, the changes are automatically detected and broadcasted to all connected clients. 
+
+In this demo, we trigger database updates using simple HTTP GET requests to specific endpoints. When these endpoints are called, the server updates the corresponding database records, which Mist automatically detects. 
+
+The system then renders the updated component HTML and pushes it through WebSockets to all subscribed clients, where the DOM is instantly updated without requiring a page refresh.
 
 Keep an eye on the incoming update-messages in the browser's console!
 
