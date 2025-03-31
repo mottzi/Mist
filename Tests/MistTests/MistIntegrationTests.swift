@@ -20,8 +20,8 @@ final class MistIntegrationTests: XCTestCase
         app.databases.use(.sqlite(.memory), as: .sqlite)
         
         // register multiple components with dublicate
-        let config = Mist.Configuration(for: app, using: [DumbComp4133.self])
-        await Mist.registerComponents(using: config)
+        let config = Mist.Configuration(for: app, components: [DumbComp4133.self])
+        await Mist.Components.shared.registerComponents(definedIn: config)
         
         // test this client message
         let subscriptionMessage = #"{ "type": "subscribe", "component": "DumbComp4133" }"#
@@ -116,8 +116,8 @@ final class MistIntegrationTests: XCTestCase
         try await app.autoMigrate()
         
         // configure mist with our test component
-        let config = Mist.Configuration(for: app, using: [TestComponent.self])
-        await Mist.registerComponents(using: config)
+        let config = Mist.Configuration(for: app, components: [TestComponent.self])
+        await Mist.Components.shared.registerComponents(definedIn: config)
         
         // subscription message
         let subscriptionMessage = #"{ "type": "subscribe", "component": "TestComponent" }"#
@@ -209,7 +209,7 @@ final class MistIntegrationTests: XCTestCase
                 guard let message = try? JSONDecoder().decode(Mist.Message.self, from: data) else { return await test.fail("Error decoding") }
   
                 // verify update message
-                guard case .update(let component, _, let id, let html) = message else { return await test.fail("Wrong Mist.Message received") }
+                guard case .update(let component, /*_,*/ let id, let html) = message else { return await test.fail("Wrong Mist.Message received") }
                 guard component == "TestComponent" else { return await test.fail("Wrong Component received") }
                 guard id == modelID else { return await test.fail("Wrong model ID received") }
                 

@@ -67,11 +67,11 @@ final class MistMessageTests: XCTestCase
         guard let message = try? JSONDecoder().decode(Mist.Message.self, from: data) else { return XCTFail("Failed to decode data to Mist message") }
         
         // Verify the message is of correct type
-        guard case .update(let component, let action, let id, let html) = message else { return XCTFail("Valid but non-update message") }
+        guard case .update(let component, /*let action,*/ let id, let html) = message else { return XCTFail("Valid but non-update message") }
         
         // Verify all fields match expected values
         XCTAssertEqual(component, "TestComponent", "Component name should match expected value")
-        XCTAssertEqual(action, "update", "Action should match expected value")
+//        XCTAssertEqual(action, "update", "Action should match expected value")
         XCTAssertEqual(id, testUUID, "UUID should match expected value")
         XCTAssertEqual(html, "<div>Updated content</div>", "HTML content should match expected value")
     }
@@ -85,7 +85,7 @@ final class MistMessageTests: XCTestCase
         // Create a update message
         let updateMessage = Mist.Message.update(
             component: "TestComponent",
-            action: "update",
+//            action: "update",
             id: testUUID,
             html: "<div>Updated content</div>"
         )
@@ -99,9 +99,9 @@ final class MistMessageTests: XCTestCase
         // Verify JSON structure and values
         XCTAssertEqual(dict["type"] as? String, "update", "Type should be 'update'")
         XCTAssertEqual(dict["component"] as? String, "TestComponent", "Component should match")
-        XCTAssertEqual(dict["action"] as? String, "update", "Action should match")
+//        XCTAssertEqual(dict["action"] as? String, "update", "Action should match")
         XCTAssertEqual(dict["id"] as? String, testUUID.uuidString, "UUID should match")
         XCTAssertEqual(dict["html"] as? String, "<div>Updated content</div>", "HTML should match")
-        XCTAssertEqual(dict.count, 5, "JSON should have 5 keys")
+        XCTAssertEqual(dict.count, 4, "JSON should have 5 keys")
     }
 }

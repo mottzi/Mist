@@ -21,8 +21,8 @@ final class MistComponentsTest: XCTestCase
         app.databases.use(.sqlite(.memory), as: .sqlite)
         
         // register multiple components with dublicate
-        let config = Mist.Configuration(for: app, using: [DummyRow1.self, DummyRow2.self, DummyRow1.self])
-        await Mist.registerComponents(using: config)
+        let config = Mist.Configuration(for: app, components: [DummyRow1.self, DummyRow2.self, DummyRow1.self])
+        await Mist.Components.shared.registerComponents(definedIn: config)
         
         // get internal component registry
         let componentsArray = await Mist.Components.shared.getStorgeForTesting()
@@ -52,8 +52,8 @@ final class MistComponentsTest: XCTestCase
         app.databases.use(.sqlite(.memory), as: .sqlite)
         
         // register multiple components with dublicate
-        let config = Mist.Configuration(for: app, using: [DummyRow1.self, DummyRow2.self, DummyRow1.self])
-        await Mist.registerComponents(using: config)
+        let config = Mist.Configuration(for: app, components: [DummyRow1.self, DummyRow2.self, DummyRow1.self])
+        await Mist.Components.shared.registerComponents(definedIn: config)
         
         // use model-based component lookup API
         let model1Components = await Mist.Components.shared.getComponents(for: DummyModel1.self)
