@@ -1,17 +1,19 @@
 import Vapor
 import Fluent
 
+// thread-safe client registry
 actor Clients
 {
     static let shared = Clients()
+    private init() { }
     
+    // mist client storage
     private var clients: [Client] = []
     
-    func getClients() -> [Client]
-    {
-        return clients
-    }
+    // returns all clients
+    func getClients() -> [Client] { return clients }
     
+    // returns clients with component subscription
     func getSubscribers(of component: String) -> [Client]
     {
         return clients.filter { $0.subscriptions.contains(component) }
@@ -28,13 +30,13 @@ extension Clients
         var subscriptions: Set<String> = []
     }
     
-    // add connection to actor
+    // adds client to actor storage
     func add(client id: UUID, socket: WebSocket)
     {
         clients.append(Client(id: id, socket: socket))
     }
     
-    // remove connection from actor
+    // removes client from actor storage
     func remove(client id: UUID)
     {
         clients.removeAll { $0.id == id }
@@ -44,8 +46,8 @@ extension Clients
 // subscriptions
 extension Clients
 {
-    // add subscription to connection
     @discardableResult
+    // adds subscription to client
     func addSubscription(_ component: String, to client: UUID) async -> Bool
     {
         // abort if component doesn't exist in registry
@@ -69,7 +71,7 @@ extension Clients
     func broadcast(_ message: Mist.Message) async
     {
         // encode component update message
-        guard case .update(let component, _, _, _) = message else { return }
+        guard case .update(let component, /*_,*/ _, _) = message else { return }
         guard let jsonData = try? JSONEncoder().encode(message) else { return }
         guard let jsonString = String(data: jsonData, encoding: .utf8) else { return }
         

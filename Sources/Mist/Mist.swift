@@ -4,10 +4,10 @@ import Fluent
 public func configure(using config: Configuration) async
 {
     // registers components in config with MistComponents
-    await registerComponents(definedIn: config)
+    await Components.shared.registerComponents(definedIn: config)
     
     // registers subscription socket on server app
-    registerMistSocket(on: config.app)
+    Socket.register(on: config.app)
 }
 
 public struct Configuration: Sendable
@@ -29,15 +29,5 @@ public struct Configuration: Sendable
         self.app = app
         self.db = db
         self.components = components
-    }
-}
-
-// initialize component system
-func registerComponents(definedIn config: Mist.Configuration) async
-{
-    // register configured components
-    for component in config.components
-    {
-        await Components.shared.register(component: component, using: config)
     }
 }

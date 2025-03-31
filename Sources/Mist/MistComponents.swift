@@ -7,7 +7,7 @@ actor Components
     static let shared = Components()
     private init() { }
     
-    // type-erased mist component storage
+    // mist component storage (type-erasure pattern)
     private var components: [AnyComponent] = []
 
     // type-safe mist component registration
@@ -59,6 +59,19 @@ actor Components
     func hasComponent(name: String) -> Bool
     {
         return components.contains { $0.name == name }
+    }
+}
+
+extension Components
+{
+    // initialize component system
+    func registerComponents(definedIn config: Mist.Configuration) async
+    {
+        // register configured components
+        for component in config.components
+        {
+            await Components.shared.register(component: component, using: config)
+        }
     }
 }
 

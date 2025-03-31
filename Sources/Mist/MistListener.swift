@@ -54,7 +54,7 @@ struct Listener<M: Model>: AsyncModelMiddleware
         // create update message with component data
         let message = Message.update(
             component: component.name,
-            action: "update",
+            // action: "update",
             id: modelID,
             html: html
         )
