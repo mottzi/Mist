@@ -7,7 +7,9 @@ Mist is a lightweight Swift server components extension for [Vapor](https://docs
 > [!WARNING]
 > This is just a proof of concept implementation and not at all production ready!
 
-AFAIK, the Swift/Vapor ecosystem does not currently have an equivalent to Phoenix [LiveView](https://hexdocs.pm/phoenix_live_view/welcome.html) or Laravel [Livewire](https://livewire.laravel.com)... If you know any Swift at all, please contribute to this project however you can! 
+AFAIK, the Swift/Vapor ecosystem does not currently have an equivalent to Phoenix [LiveView](https://hexdocs.pm/phoenix_live_view/welcome.html) or Laravel [Livewire](https://livewire.laravel.com), [HTMX](https://htmx.org) etc. The end goal of this project is to make Mist a usefull equivalent to those tools, but for the Swift / Vapor ecosystem!
+
+Please consider using your Swift skills to contribute to Mist in whatever ways you can, as this project will only go as far as the community takes it! If you have suggestions or criticism, feel free to [open an issue](https://github.com/mottzi/Mist/issues/new)!
 
 ## Demo
 
@@ -234,13 +236,50 @@ try await dummyModel2.save(on: app.db)
 
 ### 8. Copy mist.js to your public directory
 
-The Mist framework package contains a mist.js file that handles client side DOM manipulation.
+The Mist framework package contains a [mist.js file](Sources/Mist/mist.js)) that handles client side DOM manipulation.
 
 Simply copy this file to your application's /Public directory.
 
 ## Documentation
 
 ### Overview
+
+**Current Features**:
+
+- Server-defined components with automatic model binding
+- Database change detection via Fluent middleware
+- Automatic WebSocket-based HTML updates to connected clients
+- Component subscription system
+- Support for single and multi-model components (with shared UUID)
+- Simple client-side DOM replacement with minimal JS
+
+**Implementation Details**:
+
+- Type-safe component registration using protocols ([MistComponent.swift](Sources/Mist/MistComponent.swift))
+- Actor-based client and component registries for thread safety ([MistClients.swift](Sources/Mist/MistClients.swift), [MistComponents.swift](Sources/Mist/MistComponents.swift))
+- Fluent database listener middleware configuration ([MistListener.swift](Sources/Mist/MistListener.swift))
+- Leaf template rendering for component HTML generation ([MistComponent.swift](Sources/Mist/MistComponent.swift))
+- JSON-based message protocol for communication over websockets ([MistSocket.swift](Sources/Mist/MistSocket.swift), [MistMessage.swift](Sources/Mist/MistMessage.swift))
+
+**Known Limitations**:
+
+- Only supports one-to-one relationships between component models via ```ìd: UUID```
+- No differential updates (sends complete HTML on each change)
+- Error handling
+- No form binding or user input handling yet
+- Testing architecture is in place but coverage is limited
+- No security hardening applied yet
+
+**Next Steps**:
+
+- Support more complex model relationships
+- Add form handling capabilities
+- Implement optimized differential updates
+- Improve connection stability and error recovery
+- Expand documentation and examples
+- Add authentication integration
+
+**Project files**:
 
 This prototype contains eight .swift and one .js file:
 
