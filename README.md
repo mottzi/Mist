@@ -7,7 +7,7 @@ Mist is a lightweight Swift server components extension for [Vapor](https://docs
 > [!WARNING]
 > This is just a proof of concept implementation and not at all production ready!
 
-AFAIK, the Swift/Vapor ecosystem does not currently have an equivalent to Phoenix [LiveView](https://hexdocs.pm/phoenix_live_view/welcome.html) or Laravel [Livewire](https://livewire.laravel.com), [HTMX](https://htmx.org) etc. The end goal of this project is to make Mist a usefull equivalent to those tools, but for the Swift / Vapor ecosystem!
+AFAIK, the Swift/Vapor ecosystem does not currently have an equivalent to [Rails/Hotwire/Turbo](https://hotwired.dev), Phoenix [LiveView](https://hexdocs.pm/phoenix_live_view/welcome.html) or Laravel [Livewire](https://livewire.laravel.com), [HTMX](https://htmx.org) etc. The end goal of this project is to make Mist a usefull equivalent to those tools, but for the Swift / Vapor ecosystem!
 
 Please consider using your Swift skills to contribute to Mist in whatever ways you can, as this project will only go as far as the community takes it! If you have suggestions or criticism, feel free to [open an issue](https://github.com/mottzi/Mist/issues/new)!
 
