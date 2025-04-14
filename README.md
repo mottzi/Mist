@@ -212,7 +212,7 @@ app.migrations.add(
 let config = Mist.Configuration(
     for: app,
     components: [
-        DummyComponents.self,
+        DummyComponent.self,
     ]
 )
 
